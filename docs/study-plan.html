@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="mr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Study plan — Learn Database School</title>
-<meta name="description" content="A 4-week study plan for the 12-lesson database course: sequence, time estimates, weekly milestones — progress saved in your browser.">
-<meta property="og:title" content="Study plan — Learn Database School">
-<meta property="og:description" content="A 4-week study plan for the 12-lesson database course: sequence, time estimates, weekly milestones — progress saved in your browser.">
-<meta property="og:image" content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title data-en="Study plan — Learn Database School">अभ्यास योजना — Learn Database School</title>
+<meta content="A 4-week study plan for the 12-lesson database course: sequence, time estimates, weekly milestones — progress saved in your browser." name="description"/>
+<meta content="Study plan — Learn Database School" property="og:title"/>
+<meta content="A 4-week study plan for the 12-lesson database course: sequence, time estimates, weekly milestones — progress saved in your browser." property="og:description"/>
+<meta content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png" property="og:image"/>
+<meta content="website" property="og:type"/>
+<meta content="summary_large_image" name="twitter:card"/>
 <style>
   :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#b45309; --ok:#16a34a; --blue:#2563eb; --bad:#dc2626; }
   @media (prefers-color-scheme: dark) { :root { --bg:#0b1220; --card:#131c2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#253349; } }
@@ -58,56 +59,62 @@
   .milestone b { color:var(--ok); }
   #done { display:none; text-align:center; background:var(--card); border:2px solid var(--ok); border-radius:20px; padding:32px 24px; margin-top:26px; }
 </style>
-</head>
-<body>
 
+<style id="i18n-css">
+#lang-pick{position:fixed;top:10px;right:10px;z-index:9999;font:600 .85rem -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--card,#fff);color:var(--ink,#0f172a);border:1px solid var(--line,#e2e8f0);border-radius:999px;padding:6px 12px;box-shadow:0 2px 10px rgba(0,0,0,.08);cursor:pointer}
+html[lang="mr"] body{font-family:"Noto Sans Devanagari","Mukta","Devanagari Sangam MN","Nirmala UI",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif}
+html[lang="mr"] svg text{font-family:"Noto Sans Devanagari","Mukta","Devanagari Sangam MN","Nirmala UI",sans-serif}
+@media print{#lang-pick{display:none}}
+</style></head>
+<body><select aria-label="Language / भाषा" id="lang-pick" onchange="schoolSetLang(this.value)">
+<option value="mr">🇮🇳 मराठी</option><option value="en">🇬🇧 English</option></select>
 <div class="wrap">
 <header>
-  <p><a href="index.html">← Back to the course home</a></p>
-  <h1>🗓️ The study plan — 12 lessons, 4 weeks</h1>
-  <p class="sub">~<b>3 sessions a week</b>: read the lesson (~15 min) + run and change its section of db/demo.py (~25 min). Tick lessons off — <b>progress is saved in this browser</b>.</p>
-  <div class="paces"><div class="pace">🐢 <b>Steady:</b> 3 sessions/week → done in 4 weeks.</div><div class="pace">🐇 <b>Fast track:</b> one weekend per part → done in 2 weekends.</div><div class="pace">💰 <b>Cost:</b> zero. Python 3's built-in SQLite on your laptop.</div></div>
+<p data-en='&lt;a href="index.html"&gt;← Back to the course home&lt;/a&gt;'><a href="index.html">← कोर्सच्या मुख्य पानाकडे परत</a></p>
+<h1 data-en="🗓️ The study plan — 12 lessons, 4 weeks">🗓️ अभ्यास योजना — 12 धडे, 4 आठवडे</h1>
+<p class="sub" data-en="~&lt;b&gt;3 sessions a week&lt;/b&gt;: read the lesson (~15 min) + run and change its section of db/demo.py (~25 min). Tick lessons off — &lt;b&gt;progress is saved in this browser&lt;/b&gt;.">~<b>आठवड्याला 3 सत्रे</b>: धडा वाचा (~15 मिनिटे) + db/demo.py चा त्याचा भाग चालवा आणि बदला (~25 मिनिटे). धडे टिक करा — <b>प्रगती या ब्राउझरमध्ये जपली जाते</b>.</p>
+<div class="paces"><div class="pace" data-en="🐢 &lt;b&gt;Steady:&lt;/b&gt; 3 sessions/week → done in 4 weeks.">🐢 <b>स्थिर:</b> आठवड्याला 3 सत्रे → 4 आठवड्यांत पूर्ण.</div><div class="pace" data-en="🐇 &lt;b&gt;Fast track:&lt;/b&gt; one weekend per part → done in 2 weekends.">🐇 <b>वेगवान मार्ग:</b> प्रत्येक भागाला एक शनिवार-रविवार → 2 शनिवार-रविवारांत पूर्ण.</div><div class="pace" data-en="💰 &lt;b&gt;Cost:&lt;/b&gt; zero. Python 3's built-in SQLite on your laptop.">💰 <b>खर्च:</b> शून्य. तुमच्या लॅपटॉपवर Python 3 चे अंगभूत SQLite.</div></div>
 </header>
 <div class="progress-box"><div class="progress-inner"><span id="ptext">0 / 12</span><div class="bar"><div id="pbar"></div></div></div></div>
 <section class="week" style="--c:#b45309">
-  <h2><span class="wk">WEEK 1</span> 🗄️ The record room — registers, keys, questions</h2>
-  <p class="goal">Why a database, tables and keys, SQL reads. Lab: build school.db, run reads and join, write two queries of your own.</p>
-  <div class="lesson-row"><input type="checkbox" data-l="l01" id="sl01"><label for="sl01"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md">01 · 🗄️ Why databases</a></label><span class="time">~35 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l02" id="sl02"><label for="sl02"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-02-tables-rows-keys/lessons/02-tables-rows-keys/README.md">02 · 📇 Tables, rows &amp; keys</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l03" id="sl03"><label for="sl03"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-03-sql-reads/lessons/03-sql-reads/README.md">03 · 🔍 SQL reads</a></label><span class="time">~45 min</span></div>
-  <div class="milestone">🏁 <b>Checkpoint:</b> you can draw the class → student → grade registers with their keys, and write a JOIN that answers 'every 3A maths grade' by hand.</div>
+<h2 data-en='&lt;span class="wk"&gt;WEEK 1&lt;/span&gt; 🗄️ The record room — registers, keys, questions'><span class="wk">आठवडा 1</span> 🗄️ रेकॉर्ड रूम — नोंदवह्या, keys, प्रश्न</h2>
+<p class="goal" data-en="Why a database, tables and keys, SQL reads. Lab: build school.db, run reads and join, write two queries of your own.">डेटाबेस का, tables आणि keys, SQL वाचन. लॅब: school.db बांधा, reads आणि join चालवा, स्वतःच्या दोन queries लिहा.</p>
+<div class="lesson-row"><input data-l="l01" id="sl01" type="checkbox"/><label data-en='&lt;a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md"&gt;01 · 🗄️ Why databases&lt;/a&gt;' for="sl01"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md">01 · 🗄️ डेटाबेस का</a></label><span class="time" data-en="~35 min">~35 मि.</span></div>
+<div class="lesson-row"><input data-l="l02" id="sl02" type="checkbox"/><label for="sl02"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-02-tables-rows-keys/lessons/02-tables-rows-keys/README.md">02 · 📇 Tables, rows &amp; keys</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l03" id="sl03" type="checkbox"/><label data-en='&lt;a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-03-sql-reads/lessons/03-sql-reads/README.md"&gt;03 · 🔍 SQL reads&lt;/a&gt;' for="sl03"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-03-sql-reads/lessons/03-sql-reads/README.md">03 · 🔍 SQL वाचन</a></label><span class="time" data-en="~45 min">~45 मि.</span></div>
+<div class="milestone" data-en="🏁 &lt;b&gt;Checkpoint:&lt;/b&gt; you can draw the class → student → grade registers with their keys, and write a JOIN that answers 'every 3A maths grade' by hand.">🏁 <b>टप्पा:</b> वर्ग → विद्यार्थी → श्रेणी या नोंदवह्या त्यांच्या keys सह तुम्ही काढू शकता, आणि 'प्रत्येक 3A गणिताची श्रेणी' उत्तर देणारा JOIN हाताने लिहू शकता.</div>
 </section>
 <section class="week" style="--c:#b45309">
-  <h2><span class="wk">WEEK 2</span> ✏️ The ledger, the shape, the catalogue</h2>
-  <p class="goal">Transactions, modelling, indexes. Lab: make a transaction fail on purpose; break a constraint; race a query with and without an index.</p>
-  <div class="lesson-row"><input type="checkbox" data-l="l04" id="sl04"><label for="sl04"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-04-transactions/lessons/04-transactions/README.md">04 · ✏️ Writes &amp; transactions</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l05" id="sl05"><label for="sl05"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-05-data-modelling/lessons/05-data-modelling/README.md">05 · 🧩 Data modelling</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l06" id="sl06"><label for="sl06"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-06-indexes/lessons/06-indexes/README.md">06 · 🗂️ Indexes</a></label><span class="time">~40 min</span></div>
-  <div class="milestone">🏁 <b>Checkpoint:</b> your failed transaction left both rows untouched; the schema refused a duplicate roll number; EXPLAIN turned a SCAN into a SEARCH and you saw the time drop.</div>
+<h2 data-en='&lt;span class="wk"&gt;WEEK 2&lt;/span&gt; ✏️ The ledger, the shape, the catalogue'><span class="wk">आठवडा 2</span> ✏️ खातेवही, आकार, कॅटलॉग</h2>
+<p class="goal" data-en="Transactions, modelling, indexes. Lab: make a transaction fail on purpose; break a constraint; race a query with and without an index.">Transactions, modelling, indexes. लॅब: मुद्दाम एक transaction फसवा; एक constraint मोडा; index सह आणि शिवाय query ची शर्यत लावा.</p>
+<div class="lesson-row"><input data-l="l04" id="sl04" type="checkbox"/><label data-en='&lt;a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-04-transactions/lessons/04-transactions/README.md"&gt;04 · ✏️ Writes &amp;amp; transactions&lt;/a&gt;' for="sl04"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-04-transactions/lessons/04-transactions/README.md">04 · ✏️ लिहिणे &amp; transactions</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l05" id="sl05" type="checkbox"/><label for="sl05"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-05-data-modelling/lessons/05-data-modelling/README.md">05 · 🧩 Data modelling</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l06" id="sl06" type="checkbox"/><label for="sl06"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-06-indexes/lessons/06-indexes/README.md">06 · 🗂️ Indexes</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="milestone" data-en="🏁 &lt;b&gt;Checkpoint:&lt;/b&gt; your failed transaction left both rows untouched; the schema refused a duplicate roll number; EXPLAIN turned a SCAN into a SEARCH and you saw the time drop.">🏁 <b>टप्पा:</b> फसलेल्या transaction ने दोन्ही ओळी जशाच्या तशा ठेवल्या; schema ने दुहेरी roll number नाकारला; EXPLAIN ने SCAN चे SEARCH केले आणि वेळ घटलेला तुम्ही पाहिला.</div>
 </section>
 <section class="week" style="--c:#1d4ed8">
-  <h2><span class="wk">WEEK 3</span> 🔒 Two clerks, renovations, the fireproof copy</h2>
-  <p class="goal">Concurrency, migrations, backups. Lab: hold a lock from a second connection; write migration 004; delete a row and restore it from your copy.</p>
-  <div class="lesson-row"><input type="checkbox" data-l="l07" id="sl07"><label for="sl07"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-07-concurrency/lessons/07-concurrency/README.md">07 · 🔒 Concurrency &amp; isolation</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l08" id="sl08"><label for="sl08"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-08-migrations/lessons/08-migrations/README.md">08 · 🏗️ Migrations</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l09" id="sl09"><label for="sl09"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-09-backups-recovery/lessons/09-backups-recovery/README.md">09 · 🧯 Backups &amp; recovery</a></label><span class="time">~35 min</span></div>
-  <div class="milestone">🏁 <b>Checkpoint:</b> you saw 'database is locked' and explained it; migrate.py applied your 004 once and never again; Rohan came back from the backup you tested.</div>
+<h2 data-en='&lt;span class="wk"&gt;WEEK 3&lt;/span&gt; 🔒 Two clerks, renovations, the fireproof copy'><span class="wk">आठवडा 3</span> 🔒 दोन कारकून, नूतनीकरण, आगीपासून सुरक्षित प्रत</h2>
+<p class="goal" data-en="Concurrency, migrations, backups. Lab: hold a lock from a second connection; write migration 004; delete a row and restore it from your copy.">Concurrency, migrations, backups. लॅब: दुसऱ्या connection मधून lock धरा; migration 004 लिहा; एक ओळ हटवा आणि तुमच्या प्रतीतून परत आणा.</p>
+<div class="lesson-row"><input data-l="l07" id="sl07" type="checkbox"/><label for="sl07"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-07-concurrency/lessons/07-concurrency/README.md">07 · 🔒 Concurrency &amp; isolation</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l08" id="sl08" type="checkbox"/><label for="sl08"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-08-migrations/lessons/08-migrations/README.md">08 · 🏗️ Migrations</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l09" id="sl09" type="checkbox"/><label for="sl09"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-09-backups-recovery/lessons/09-backups-recovery/README.md">09 · 🧯 Backups &amp; recovery</a></label><span class="time" data-en="~35 min">~35 मि.</span></div>
+<div class="milestone" data-en="🏁 &lt;b&gt;Checkpoint:&lt;/b&gt; you saw 'database is locked' and explained it; migrate.py applied your 004 once and never again; Rohan came back from the backup you tested.">🏁 <b>टप्पा:</b> तुम्ही 'database is locked' पाहिले आणि समजावले; migrate.py ने तुमचे 004 एकदाच लागू केले, पुन्हा कधीच नाही; तुम्ही तपासलेल्या backup मधून रोहन परत आला.</div>
 </section>
 <section class="week" style="--c:#1d4ed8">
-  <h2><span class="wk">WEEK 4</span> 📈 Scaling, other rooms, on call</h2>
-  <p class="goal">Scaling ladder, NoSQL rooms, performance and operations. Lab: fix the N+1; write the on-call checklist for school.db.</p>
-  <div class="lesson-row"><input type="checkbox" data-l="l10" id="sl10"><label for="sl10"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-10-scaling/lessons/10-scaling/README.md">10 · 📈 Scaling</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l11" id="sl11"><label for="sl11"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-11-nosql-other-rooms/lessons/11-nosql-other-rooms/README.md">11 · 🏘️ NoSQL &amp; other rooms</a></label><span class="time">~40 min</span></div>
-  <div class="lesson-row"><input type="checkbox" data-l="l12" id="sl12"><label for="sl12"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-12-performance-ops/lessons/12-performance-ops/README.md">12 · 🩺 Performance &amp; operations</a></label><span class="time">~45 min</span></div>
-  <div class="milestone">🏁 <b>Checkpoint:</b> 🏆 <b>Capstone:</b> add a teachers table with a foreign key, an index, a migration and a query — then explain out loud what breaks first as the school grows, and what you would do about it, in order.</div>
+<h2 data-en='&lt;span class="wk"&gt;WEEK 4&lt;/span&gt; 📈 Scaling, other rooms, on call'><span class="wk">आठवडा 4</span> 📈 Scaling, इतर खोल्या, on call</h2>
+<p class="goal" data-en="Scaling ladder, NoSQL rooms, performance and operations. Lab: fix the N+1; write the on-call checklist for school.db.">Scaling ची शिडी, NoSQL खोल्या, performance आणि operations. लॅब: N+1 दुरुस्त करा; school.db साठी on-call चेकलिस्ट लिहा.</p>
+<div class="lesson-row"><input data-l="l10" id="sl10" type="checkbox"/><label for="sl10"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-10-scaling/lessons/10-scaling/README.md">10 · 📈 Scaling</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l11" id="sl11" type="checkbox"/><label data-en='&lt;a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-11-nosql-other-rooms/lessons/11-nosql-other-rooms/README.md"&gt;11 · 🏘️ NoSQL &amp;amp; other rooms&lt;/a&gt;' for="sl11"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-11-nosql-other-rooms/lessons/11-nosql-other-rooms/README.md">11 · 🏘️ NoSQL &amp; इतर खोल्या</a></label><span class="time" data-en="~40 min">~40 मि.</span></div>
+<div class="lesson-row"><input data-l="l12" id="sl12" type="checkbox"/><label for="sl12"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-12-performance-ops/lessons/12-performance-ops/README.md">12 · 🩺 Performance &amp; operations</a></label><span class="time" data-en="~45 min">~45 मि.</span></div>
+<div class="milestone" data-en="🏁 &lt;b&gt;Checkpoint:&lt;/b&gt; 🏆 &lt;b&gt;Capstone:&lt;/b&gt; add a teachers table with a foreign key, an index, a migration and a query — then explain out loud what breaks first as the school grows, and what you would do about it, in order.">🏁 <b>टप्पा:</b> 🏆 <b>कळस-प्रकल्प:</b> foreign key, index, migration आणि query सह teachers table जोडा — मग शाळा वाढताना आधी काय मोडेल आणि त्याबद्दल तुम्ही काय कराल, क्रमाने, मोठ्याने समजावा.</div>
 </section>
 <div id="done">
-  <h2>🎓 12 / 12 — the record room is yours!</h2>
-  <p class="sub" style="margin:10px auto 0">Next: the <a href="https://baluraut.github.io/learn-api-school/">API school</a> puts a counter in front of this room, the <a href="https://baluraut.github.io/learn-vectordb-school/">VectorDB school</a> opens the meaning hall next door, and the <a href="https://baluraut.github.io/school/">School portal</a> has the rest.</p>
+<h2 data-en="🎓 12 / 12 — the record room is yours!">🎓 12 / 12 — रेकॉर्ड रूम तुमची झाली!</h2>
+<p class="sub" data-en='Next: the &lt;a href="https://baluraut.github.io/learn-api-school/"&gt;API school&lt;/a&gt; puts a counter in front of this room, the &lt;a href="https://baluraut.github.io/learn-vectordb-school/"&gt;VectorDB school&lt;/a&gt; opens the meaning hall next door, and the &lt;a href="https://baluraut.github.io/school/"&gt;School portal&lt;/a&gt; has the rest.' style="margin:10px auto 0">पुढे: <a href="https://baluraut.github.io/learn-api-school/">API शाळा</a> या खोलीसमोर काउंटर उभे करते, <a href="https://baluraut.github.io/learn-vectordb-school/">VectorDB शाळा</a> शेजारचा अर्थाचा हॉल उघडते, आणि बाकीचे <a href="https://baluraut.github.io/school/">शाळेच्या पोर्टलवर</a>.</p>
 </div>
-<footer>
-  Learn Database School · the record room is in the repo · <a href="index.html">Course home</a> · <a href="lesson-diagrams.html">Lesson diagrams</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 the Dictionary</a> · <a href="https://baluraut.github.io/school/">🏫 all schools</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 found a mistake?</a>
-</footer>
+<footer data-en='
+  Learn Database School · the record room is in the repo · &lt;a href="index.html"&gt;Course home&lt;/a&gt; · &lt;a href="lesson-diagrams.html"&gt;Lesson diagrams&lt;/a&gt; · &lt;a href="https://github.com/BaluRaut/learn-database-school"&gt;GitHub&lt;/a&gt; · &lt;a href="https://baluraut.github.io/school/dictionary.html"&gt;📖 the Dictionary&lt;/a&gt; · &lt;a href="https://baluraut.github.io/school/"&gt;🏫 all schools&lt;/a&gt; · &lt;a href="https://github.com/BaluRaut/learn-database-school/issues"&gt;🐛 found a mistake?&lt;/a&gt;
+'>Learn Database School · रेकॉर्ड रूम रेपोच्या आत आहे · <a href="index.html">कोर्स मुख्य पान</a> · <a href="lesson-diagrams.html">धड्यांच्या आकृत्या</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 शब्दकोश</a> · <a href="https://baluraut.github.io/school/">🏫 सर्व शाळा</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 चूक सापडली?</a></footer>
 </div>
 <script>
 (function(){
@@ -128,5 +135,22 @@
   render();
 })();
 </script>
-</body>
+
+<script id="i18n-js">
+function schoolSetLang(l){
+  try{localStorage.setItem('school-lang',l)}catch(e){}
+  document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-en]').forEach(function(el){
+    if(!el.hasAttribute('data-mr')) el.setAttribute('data-mr', el.innerHTML);
+    el.innerHTML = (l==='en') ? el.getAttribute('data-en') : el.getAttribute('data-mr');
+  });
+  document.querySelectorAll('[data-en-ph]').forEach(function(el){
+    if(!el.hasAttribute('data-mr-ph')) el.setAttribute('data-mr-ph', el.getAttribute('placeholder'));
+    el.setAttribute('placeholder', (l==='en') ? el.getAttribute('data-en-ph') : el.getAttribute('data-mr-ph'));
+  });
+  var p=document.getElementById('lang-pick'); if(p) p.value=l;
+}
+(function(){ var l='mr'; try{ l=localStorage.getItem('school-lang')||'mr'; }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){schoolSetLang(l)}); else schoolSetLang(l); })();
+</script></body>
 </html>

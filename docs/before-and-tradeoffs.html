@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="mr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Before & trade-offs — Learn Database School</title>
-<meta name="description" content="For every big database idea: what came before, merits and demerits, and where to use it vs where not.">
-<meta property="og:title" content="Before & trade-offs — Learn Database School">
-<meta property="og:description" content="For every big database idea: what came before, merits and demerits, and where to use it vs where not.">
-<meta property="og:image" content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title data-en="Before &amp;amp; trade-offs — Learn Database School">आधी &amp; फायदे-तोटे — Learn Database School</title>
+<meta content="For every big database idea: what came before, merits and demerits, and where to use it vs where not." name="description"/>
+<meta content="Before &amp; trade-offs — Learn Database School" property="og:title"/>
+<meta content="For every big database idea: what came before, merits and demerits, and where to use it vs where not." property="og:description"/>
+<meta content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png" property="og:image"/>
+<meta content="website" property="og:type"/>
+<meta content="summary_large_image" name="twitter:card"/>
 <style>
   :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#b45309; --ok:#16a34a; --blue:#2563eb; --bad:#dc2626; }
   @media (prefers-color-scheme: dark) { :root { --bg:#0b1220; --card:#131c2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#253349; } }
@@ -52,90 +53,112 @@
   .toc a { border:1px solid var(--line); background:var(--card); border-radius:999px; padding:5px 12px; font-size:.82rem; color:var(--muted); text-decoration:none; }
   .toc a:hover { color:var(--ink); border-color:var(--muted); }
 </style>
-</head>
-<body>
 
+<style id="i18n-css">
+#lang-pick{position:fixed;top:10px;right:10px;z-index:9999;font:600 .85rem -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--card,#fff);color:var(--ink,#0f172a);border:1px solid var(--line,#e2e8f0);border-radius:999px;padding:6px 12px;box-shadow:0 2px 10px rgba(0,0,0,.08);cursor:pointer}
+html[lang="mr"] body{font-family:"Noto Sans Devanagari","Mukta","Devanagari Sangam MN","Nirmala UI",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif}
+html[lang="mr"] svg text{font-family:"Noto Sans Devanagari","Mukta","Devanagari Sangam MN","Nirmala UI",sans-serif}
+@media print{#lang-pick{display:none}}
+</style></head>
+<body><select aria-label="Language / भाषा" id="lang-pick" onchange="schoolSetLang(this.value)">
+<option value="mr">🇮🇳 मराठी</option><option value="en">🇬🇧 English</option></select>
 <div class="wrap">
 <header>
-  <p><a href="index.html">← Back to the course home</a></p>
-  <h1>⏮️ Before &amp; trade-offs</h1>
-  <p class="sub">Every tool replaced something worse — and is itself the wrong tool somewhere. For each big idea: what life was like <b>before</b>, honest <b>merits ✅ / demerits ❌</b>, and <b>where to use it 👍 vs not 👎</b>.</p>
-  <nav class="toc"><a href="#sql">🗄️ Relational vs NoSQL</a><a href="#norm">🧩 Normalise vs denormalise</a><a href="#idx">🗂️ Indexes</a><a href="#iso">🔒 Isolation levels</a><a href="#mig">🏗️ Expand/contract migrations</a><a href="#scale">📈 Replicas vs sharding</a><a href="#managed">☁️ Managed vs self-hosted</a></nav>
+<p data-en='&lt;a href="index.html"&gt;← Back to the course home&lt;/a&gt;'><a href="index.html">← कोर्सच्या मुख्य पानाकडे परत</a></p>
+<h1 data-en="⏮️ Before &amp;amp; trade-offs">⏮️ आधी काय होते &amp; फायदे-तोटे</h1>
+<p class="sub" data-en="Every tool replaced something worse — and is itself the wrong tool somewhere. For each big idea: what life was like &lt;b&gt;before&lt;/b&gt;, honest &lt;b&gt;merits ✅ / demerits ❌&lt;/b&gt;, and &lt;b&gt;where to use it 👍 vs not 👎&lt;/b&gt;.">प्रत्येक साधनाने काहीतरी वाईट गोष्ट बदलली — आणि तेच साधन कुठेतरी चुकीचे ठरते. प्रत्येक मोठ्या कल्पनेसाठी: <b>आधी</b> जीवन कसे होते, प्रामाणिक <b>फायदे ✅ / तोटे ❌</b>, आणि <b>कुठे वापरावी 👍 विरुद्ध कुठे नाही 👎</b>.</p>
+<nav class="toc" data-en='&lt;a href="#sql"&gt;🗄️ Relational vs NoSQL&lt;/a&gt;&lt;a href="#norm"&gt;🧩 Normalise vs denormalise&lt;/a&gt;&lt;a href="#idx"&gt;🗂️ Indexes&lt;/a&gt;&lt;a href="#iso"&gt;🔒 Isolation levels&lt;/a&gt;&lt;a href="#mig"&gt;🏗️ Expand/contract migrations&lt;/a&gt;&lt;a href="#scale"&gt;📈 Replicas vs sharding&lt;/a&gt;&lt;a href="#managed"&gt;☁️ Managed vs self-hosted&lt;/a&gt;'><a href="#sql">🗄️ Relational विरुद्ध NoSQL</a><a href="#norm">🧩 Normalise विरुद्ध denormalise</a><a href="#idx">🗂️ Indexes</a><a href="#iso">🔒 Isolation levels</a><a href="#mig">🏗️ Expand/contract migrations</a><a href="#scale">📈 Replicas विरुद्ध sharding</a><a href="#managed">☁️ Managed विरुद्ध self-hosted</a></nav>
 </header>
-
 <section class="term" id="sql" style="--c:#b45309">
-  <h2>🗄️ Relational (SQL) vs NoSQL — lessons 02, 11</h2>
-  <div class="hist"><b>⏮️ Before relational databases (1970s) and before the NoSQL wave (2009)</b><p>Records lived in files with app-specific layouts; every program parsed its own format and nobody could ask a new question without new code. Relational databases put the questions into SQL. Then web scale made some teams throw the constraints away for speed — and many later bought them back.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>constraints make bad data impossible, not merely unlikely</li><li>JOINs and transactions answer new questions without new code</li><li>one mature room (Postgres) serves most apps for years</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>schema changes need migrations (lesson 08)</li><li>JOIN-heavy queries need care at scale</li><li>horizontal write scaling is hard (lesson 10)</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>anything with relationships, money, or rules — the default</li><li>reporting and ad-hoc questions</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>a question the relational shape answers badly: nearest-by-meaning, graph hops, billions of appends</li><li>'NoSQL because scale' with no measurement — the classic regret</li></ul></div>
-  </div>
+<h2 data-en="🗄️ Relational (SQL) vs NoSQL — lessons 02, 11">🗄️ Relational (SQL) विरुद्ध NoSQL — धडे 02, 11</h2>
+<div class="hist"><b data-en="⏮️ Before relational databases (1970s) and before the NoSQL wave (2009)">⏮️ Relational डेटाबेसआधी (1970 चे दशक) आणि NoSQL लाटेआधी (2009)</b><p data-en="Records lived in files with app-specific layouts; every program parsed its own format and nobody could ask a new question without new code. Relational databases put the questions into SQL. Then web scale made some teams throw the constraints away for speed — and many later bought them back.">नोंदी ॲप-विशिष्ट रचनेच्या फाइल्समध्ये राहायच्या; प्रत्येक प्रोग्राम स्वतःचे format वाचायचा आणि नव्या कोडशिवाय कोणीच नवा प्रश्न विचारू शकत नव्हता. Relational डेटाबेसनी प्रश्न SQL मध्ये आणले. मग web scale मुळे काही टीम्सनी वेगासाठी constraints फेकून दिले — आणि अनेकांनी नंतर ते परत विकत घेतले.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="constraints make bad data impossible, not merely unlikely">constraints मुळे चुकीचा data अशक्य होतो, नुसता कमी संभाव्य नाही</li><li data-en="JOINs and transactions answer new questions without new code">JOINs आणि transactions नव्या कोडशिवाय नव्या प्रश्नांना उत्तर देतात</li><li data-en="one mature room (Postgres) serves most apps for years">एक प्रौढ खोली (Postgres) बहुतेक ॲप्सना वर्षानुवर्षे पुरते</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="schema changes need migrations (lesson 08)">schema बदलांना migrations लागतात (धडा 08)</li><li data-en="JOIN-heavy queries need care at scale">JOIN-भारी queries ना scale वर काळजी लागते</li><li data-en="horizontal write scaling is hard (lesson 10)">आडवे write scaling कठीण आहे (धडा 10)</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="anything with relationships, money, or rules — the default">नाती, पैसा किंवा नियम असलेले काहीही — default</li><li data-en="reporting and ad-hoc questions">अहवाल आणि तात्कालिक प्रश्न</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="a question the relational shape answers badly: nearest-by-meaning, graph hops, billions of appends">relational आकार वाईट उत्तर देतो असा प्रश्न: अर्थाने-जवळचे, graph उड्या, अब्जावधी appends</li><li data-en="'NoSQL because scale' with no measurement — the classic regret">मोजमापाशिवाय 'scale साठी NoSQL' — नेहमीचा पश्चात्ताप</li></ul></div>
+</div>
 </section>
 <section class="term" id="norm" style="--c:#b45309">
-  <h2>🧩 Normalise vs denormalise — lesson 05</h2>
-  <div class="hist"><b>⏮️ Before normal forms</b><p>One big spreadsheet-shaped table: a teacher's phone number copied into 30 rows, updated in 29, and a report that was wrong for a year.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>one fact, one place: updates cannot disagree</li><li>smaller rows, cleaner constraints</li><li>the schema documents the domain</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>more JOINs per screen</li><li>read-heavy pages may need several queries</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>the source of truth; anything edited</li><li>early — it is much easier to denormalise later than the reverse</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>a hot read path where a measured JOIN is the bottleneck — copy the value and own the rule that keeps it true</li><li>analytics tables that are rebuilt, not edited</li></ul></div>
-  </div>
+<h2 data-en="🧩 Normalise vs denormalise — lesson 05">🧩 Normalise विरुद्ध denormalise — धडा 05</h2>
+<div class="hist"><b data-en="⏮️ Before normal forms">⏮️ Normal forms आधी</b><p data-en="One big spreadsheet-shaped table: a teacher's phone number copied into 30 rows, updated in 29, and a report that was wrong for a year.">एक मोठा spreadsheet-सारखा table: शिक्षकाचा फोन 30 ओळींत कॉपी, 29 मध्ये अद्ययावत, आणि वर्षभर चुकीचा राहिलेला अहवाल.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="one fact, one place: updates cannot disagree">एक तथ्य, एक जागा: बदल एकमेकांशी विसंगत होऊ शकत नाहीत</li><li data-en="smaller rows, cleaner constraints">छोट्या ओळी, स्वच्छ constraints</li><li data-en="the schema documents the domain">schema हेच क्षेत्राचे दस्तऐवज</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="more JOINs per screen">प्रत्येक screen ला जास्त JOINs</li><li data-en="read-heavy pages may need several queries">वाचन-भारी पानांना अनेक queries लागू शकतात</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="the source of truth; anything edited">सत्याचा स्रोत; संपादित होणारे काहीही</li><li data-en="early — it is much easier to denormalise later than the reverse">लवकर — नंतर denormalise करणे उलट्यापेक्षा खूप सोपे आहे</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="a hot read path where a measured JOIN is the bottleneck — copy the value and own the rule that keeps it true">गरम वाचन-मार्ग जिथे मोजलेला JOIN अडथळा आहे — मूल्य कॉपी करा आणि ते खरे ठेवणारा नियम स्वतःकडे घ्या</li><li data-en="analytics tables that are rebuilt, not edited">पुन्हा बांधल्या जाणाऱ्या, संपादित न होणाऱ्या analytics tables</li></ul></div>
+</div>
 </section>
 <section class="term" id="idx" style="--c:#b45309">
-  <h2>🗂️ Indexes — lesson 06</h2>
-  <div class="hist"><b>⏮️ Before the card catalogue</b><p>Every question read every line. Fine at 5 rows; the 200,000-row attendance table took a full scan per lookup.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>SEARCH instead of SCAN: milliseconds to microseconds</li><li>enforce uniqueness (UNIQUE) as a side effect</li><li>make ORDER BY and JOIN cheap</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>every write updates every index</li><li>space; and a wrong column order helps nobody</li><li>the planner may ignore an index on tiny tables</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>columns you filter, join and sort on; foreign keys</li><li>after EXPLAIN shows a SCAN on a big table</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>'index everything' — writes crawl</li><li>before measuring — a 5-row table needs no catalogue</li></ul></div>
-  </div>
+<h2 data-en="🗂️ Indexes — lesson 06">🗂️ Indexes — धडा 06</h2>
+<div class="hist"><b data-en="⏮️ Before the card catalogue">⏮️ कार्ड कॅटलॉगआधी</b><p data-en="Every question read every line. Fine at 5 rows; the 200,000-row attendance table took a full scan per lookup.">प्रत्येक प्रश्न प्रत्येक ओळ वाचायचा. 5 ओळींना ठीक; 200,000 ओळींच्या attendance table ला प्रत्येक शोधासाठी पूर्ण scan.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="SEARCH instead of SCAN: milliseconds to microseconds">SCAN ऐवजी SEARCH: milliseconds वरून microseconds</li><li data-en="enforce uniqueness (UNIQUE) as a side effect">बोनस म्हणून uniqueness (UNIQUE) लागू होते</li><li data-en="make ORDER BY and JOIN cheap">ORDER BY आणि JOIN स्वस्त होतात</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="every write updates every index">प्रत्येक write प्रत्येक index अद्ययावत करते</li><li data-en="space; and a wrong column order helps nobody">जागा; आणि चुकीचा column क्रम कोणालाच मदत करत नाही</li><li data-en="the planner may ignore an index on tiny tables">छोट्या tables वर planner index दुर्लक्षित करू शकतो</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="columns you filter, join and sort on; foreign keys">जे गाळता, join करता आणि क्रमाने लावता ते columns; foreign keys</li><li data-en="after EXPLAIN shows a SCAN on a big table">मोठ्या table वर EXPLAIN ने SCAN दाखवल्यानंतर</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="'index everything' — writes crawl">'सगळ्यावर index' — writes रांगतात</li><li data-en="before measuring — a 5-row table needs no catalogue">मोजण्याआधी — 5 ओळींच्या table ला कॅटलॉग नको</li></ul></div>
+</div>
 </section>
 <section class="term" id="iso" style="--c:#1d4ed8">
-  <h2>🔒 Isolation levels — lesson 07</h2>
-  <div class="hist"><b>⏮️ Before isolation</b><p>Two clerks writing the same register at once produced torn rows; the fix was 'only one program uses the file' — until there were two programs.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>read committed: fast, no dirty reads — the sane default</li><li>serializable: correctness as if one clerk at a time</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>stricter levels wait more and deadlock more</li><li>subtle anomalies (phantoms, lost updates) at the looser levels</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>money and counters: serializable or explicit locks (SELECT … FOR UPDATE)</li><li>everything else: read committed + short transactions</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>long transactions holding locks across user think-time</li><li>assuming your ORM's default is serializable — it almost never is</li></ul></div>
-  </div>
+<h2 data-en="🔒 Isolation levels — lesson 07">🔒 Isolation levels — धडा 07</h2>
+<div class="hist"><b data-en="⏮️ Before isolation">⏮️ Isolation आधी</b><p data-en="Two clerks writing the same register at once produced torn rows; the fix was 'only one program uses the file' — until there were two programs.">दोन कारकून एकाच वेळी एकच नोंदवही लिहिली की फाटलेल्या ओळी तयार व्हायच्या; उपाय होता 'फाइल फक्त एकच प्रोग्राम वापरेल' — दोन प्रोग्राम येईपर्यंत.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="read committed: fast, no dirty reads — the sane default">read committed: वेगवान, dirty reads नाहीत — शहाणा default</li><li data-en="serializable: correctness as if one clerk at a time">serializable: जणू एका वेळी एकच कारकून — अचूकता</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="stricter levels wait more and deadlock more">कडक पातळ्या जास्त वाट पाहतात आणि जास्त deadlock करतात</li><li data-en="subtle anomalies (phantoms, lost updates) at the looser levels">सैल पातळ्यांवर सूक्ष्म विसंगती (phantoms, lost updates)</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="money and counters: serializable or explicit locks (SELECT … FOR UPDATE)">पैसा आणि counters: serializable किंवा स्पष्ट locks (SELECT … FOR UPDATE)</li><li data-en="everything else: read committed + short transactions">बाकी सगळे: read committed + छोटे transactions</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="long transactions holding locks across user think-time">वापरकर्ता विचार करत असताना locks धरून ठेवणारे लांब transactions</li><li data-en="assuming your ORM's default is serializable — it almost never is">तुमच्या ORM चे default serializable आहे असे गृहीत धरणे — ते जवळपास कधीच नसते</li></ul></div>
+</div>
 </section>
 <section class="term" id="mig" style="--c:#1d4ed8">
-  <h2>🏗️ Expand/contract migrations — lesson 08</h2>
-  <div class="hist"><b>⏮️ Before versioned migrations</b><p>Someone ran ALTER TABLE on the production room by hand on a Friday; nobody could say what the schema was, and rollback meant memory.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>schema in git: reviewable, repeatable, rehearsable</li><li>expand → migrate → contract keeps school open through a rename</li><li>the logbook (schema_migrations) makes 'what ran where' a query</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>discipline: one migration = one change, always reversible or rehearsed</li><li>backfills on big tables must be batched</li><li>two code versions run at once for a while</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>every schema change, no exceptions</li><li>zero-downtime renames and type changes</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>a one-step rename on a live table — it breaks the old code instantly</li><li>destructive migrations without a tested backup (lesson 09)</li></ul></div>
-  </div>
+<h2 data-en="🏗️ Expand/contract migrations — lesson 08">🏗️ Expand/contract migrations — धडा 08</h2>
+<div class="hist"><b data-en="⏮️ Before versioned migrations">⏮️ आवृत्ती असलेल्या migrations आधी</b><p data-en="Someone ran ALTER TABLE on the production room by hand on a Friday; nobody could say what the schema was, and rollback meant memory.">कोणीतरी शुक्रवारी production खोलीवर हाताने ALTER TABLE चालवले; schema काय आहे हे कोणीच सांगू शकत नव्हते, आणि rollback म्हणजे स्मरणशक्ती.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="schema in git: reviewable, repeatable, rehearsable">git मधले schema: पुनरावलोकनयोग्य, पुनरावृत्तीयोग्य, तालीम करण्याजोगे</li><li data-en="expand → migrate → contract keeps school open through a rename">expand → migrate → contract नाव बदलतानाही शाळा उघडी ठेवते</li><li data-en="the logbook (schema_migrations) makes 'what ran where' a query">नोंदवही (schema_migrations) मुळे 'कुठे काय चालले' ही एक query होते</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="discipline: one migration = one change, always reversible or rehearsed">शिस्त: एक migration = एक बदल, नेहमी उलट करता येणारा किंवा तालीम केलेला</li><li data-en="backfills on big tables must be batched">मोठ्या tables वरचे backfills तुकड्यांत करावे लागतात</li><li data-en="two code versions run at once for a while">काही काळ कोडच्या दोन आवृत्त्या एकत्र चालतात</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="every schema change, no exceptions">प्रत्येक schema बदल, अपवाद नाही</li><li data-en="zero-downtime renames and type changes">downtime शिवाय नावे आणि प्रकार बदलणे</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="a one-step rename on a live table — it breaks the old code instantly">चालू table वर एका पायरीत नाव बदलणे — जुना कोड तत्काळ मोडतो</li><li data-en="destructive migrations without a tested backup (lesson 09)">तपासलेल्या backup शिवाय विनाशकारी migrations (धडा 09)</li></ul></div>
+</div>
 </section>
 <section class="term" id="scale" style="--c:#1d4ed8">
-  <h2>📈 Read replicas vs sharding — lesson 10</h2>
-  <div class="hist"><b>⏮️ Before replicas</b><p>One machine; when it filled up, the answer was a bigger machine — until there was no bigger machine.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>replicas: cheap read scaling and a warm standby</li><li>sharding: writes and data spread across rooms — the last resort that works</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>replication lag: a reader may see the past</li><li>sharding breaks JOINs and cross-shard transactions; re-sharding is a project</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>replicas for read-heavy apps and reporting</li><li>sharding when one primary genuinely cannot hold the writes — after pool, cache, indexes, bigger box</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>reading your own write from a replica (lag surprises)</li><li>sharding a 50 GB database because a blog said so</li></ul></div>
-  </div>
+<h2 data-en="📈 Read replicas vs sharding — lesson 10">📈 Read replicas विरुद्ध sharding — धडा 10</h2>
+<div class="hist"><b data-en="⏮️ Before replicas">⏮️ Replicas आधी</b><p data-en="One machine; when it filled up, the answer was a bigger machine — until there was no bigger machine.">एकच मशीन; ते भरले की उत्तर होते मोठे मशीन — आणखी मोठे मशीन उरेपर्यंत.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="replicas: cheap read scaling and a warm standby">replicas: स्वस्त read scaling आणि तयार standby</li><li data-en="sharding: writes and data spread across rooms — the last resort that works">sharding: writes आणि data खोल्यांत विभागलेला — चालणारा शेवटचा उपाय</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="replication lag: a reader may see the past">replication lag: वाचणाऱ्याला भूतकाळ दिसू शकतो</li><li data-en="sharding breaks JOINs and cross-shard transactions; re-sharding is a project">sharding JOINs आणि cross-shard transactions मोडते; पुन्हा shard करणे हा वेगळा प्रकल्प</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="replicas for read-heavy apps and reporting">वाचन-भारी ॲप्स आणि अहवालांसाठी replicas</li><li data-en="sharding when one primary genuinely cannot hold the writes — after pool, cache, indexes, bigger box">एक primary खरोखर writes पेलू शकत नाही तेव्हा sharding — pool, cache, indexes, मोठे मशीन नंतर</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="reading your own write from a replica (lag surprises)">replica वरून स्वतःचेच लिहिलेले वाचणे (lag चे आश्चर्य)</li><li data-en="sharding a 50 GB database because a blog said so">ब्लॉगने सांगितले म्हणून 50 GB डेटाबेस shard करणे</li></ul></div>
+</div>
 </section>
 <section class="term" id="managed" style="--c:#1d4ed8">
-  <h2>☁️ Managed (RDS) vs self-hosted — lessons 09, 10</h2>
-  <div class="hist"><b>⏮️ Before managed databases</b><p>Every team ran its own Postgres: patching, backups, failover scripts, and one person who knew where the WAL went.</p></div>
-  <div class="quad">
-    <div class="q merit"><h4>✅ Merits</h4><ul><li>backups, patches, Multi-AZ failover, monitoring — rented</li><li>replicas and point-in-time restore are checkboxes</li></ul></div>
-    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>costs more per hour; less knob access</li><li>lock-in flavours; migration effort later</li><li>you still own the schema, queries, indexes and drills</li></ul></div>
-    <div class="q use"><h4>👍 Use when</h4><ul><li>most teams, most of the time (AWS school L17)</li><li>when the one person who knew the WAL leaves</li></ul></div>
-    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>exotic extensions or extreme tuning the service forbids</li><li>a laptop lab — SQLite is free and honest</li></ul></div>
-  </div>
-</section>
-<footer>
-  Learn Database School · the record room is in the repo · <a href="index.html">Course home</a> · <a href="lesson-diagrams.html">Lesson diagrams</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 the Dictionary</a> · <a href="https://baluraut.github.io/school/">🏫 all schools</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 found a mistake?</a>
-</footer>
+<h2 data-en="☁️ Managed (RDS) vs self-hosted — lessons 09, 10">☁️ Managed (RDS) विरुद्ध self-hosted — धडे 09, 10</h2>
+<div class="hist"><b data-en="⏮️ Before managed databases">⏮️ managed डेटाबेसच्या आधी</b><p data-en="Every team ran its own Postgres: patching, backups, failover scripts, and one person who knew where the WAL went.">प्रत्येक टीम स्वतःचा Postgres चालवायची: patching, backups, failover scripts, आणि WAL कुठे जातो हे माहीत असलेली एकच व्यक्ती.</p></div>
+<div class="quad">
+<div class="q merit"><h4 data-en="✅ Merits">✅ फायदे</h4><ul><li data-en="backups, patches, Multi-AZ failover, monitoring — rented">backups, patches, Multi-AZ failover, monitoring — भाड्याने</li><li data-en="replicas and point-in-time restore are checkboxes">replicas आणि point-in-time restore म्हणजे checkboxes</li></ul></div>
+<div class="q demerit"><h4 data-en="❌ Demerits">❌ तोटे</h4><ul><li data-en="costs more per hour; less knob access">तासाला जास्त खर्च; कमी नियंत्रण</li><li data-en="lock-in flavours; migration effort later">lock-in चे प्रकार; नंतर स्थलांतराचे श्रम</li><li data-en="you still own the schema, queries, indexes and drills">schema, queries, indexes आणि तालमी तरीही तुमच्याच</li></ul></div>
+<div class="q use"><h4 data-en="👍 Use when">👍 वापरा जेव्हा</h4><ul><li data-en="most teams, most of the time (AWS school L17)">बहुतेक टीम्स, बहुतेक वेळा (AWS शाळा L17)</li><li data-en="when the one person who knew the WAL leaves">WAL माहीत असलेली एकच व्यक्ती सोडून गेल्यावर</li></ul></div>
+<div class="q avoid"><h4 data-en="👎 Think twice when">👎 दोनदा विचार करा जेव्हा</h4><ul><li data-en="exotic extensions or extreme tuning the service forbids">सेवा नाकारते अशी विचित्र extensions किंवा टोकाचे tuning</li><li data-en="a laptop lab — SQLite is free and honest">लॅपटॉपची लॅब — SQLite मोफत आणि प्रामाणिक आहे</li></ul></div>
 </div>
-</body>
+</section>
+<footer data-en='
+  Learn Database School · the record room is in the repo · &lt;a href="index.html"&gt;Course home&lt;/a&gt; · &lt;a href="lesson-diagrams.html"&gt;Lesson diagrams&lt;/a&gt; · &lt;a href="https://github.com/BaluRaut/learn-database-school"&gt;GitHub&lt;/a&gt; · &lt;a href="https://baluraut.github.io/school/dictionary.html"&gt;📖 the Dictionary&lt;/a&gt; · &lt;a href="https://baluraut.github.io/school/"&gt;🏫 all schools&lt;/a&gt; · &lt;a href="https://github.com/BaluRaut/learn-database-school/issues"&gt;🐛 found a mistake?&lt;/a&gt;
+'>Learn Database School · रेकॉर्ड रूम रेपोच्या आत आहे · <a href="index.html">कोर्स मुख्य पान</a> · <a href="lesson-diagrams.html">धड्यांच्या आकृत्या</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 शब्दकोश</a> · <a href="https://baluraut.github.io/school/">🏫 सर्व शाळा</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 चूक सापडली?</a></footer>
+</div>
+
+<script id="i18n-js">
+function schoolSetLang(l){
+  try{localStorage.setItem('school-lang',l)}catch(e){}
+  document.documentElement.setAttribute('lang',l);
+  document.querySelectorAll('[data-en]').forEach(function(el){
+    if(!el.hasAttribute('data-mr')) el.setAttribute('data-mr', el.innerHTML);
+    el.innerHTML = (l==='en') ? el.getAttribute('data-en') : el.getAttribute('data-mr');
+  });
+  document.querySelectorAll('[data-en-ph]').forEach(function(el){
+    if(!el.hasAttribute('data-mr-ph')) el.setAttribute('data-mr-ph', el.getAttribute('placeholder'));
+    el.setAttribute('placeholder', (l==='en') ? el.getAttribute('data-en-ph') : el.getAttribute('data-mr-ph'));
+  });
+  var p=document.getElementById('lang-pick'); if(p) p.value=l;
+}
+(function(){ var l='mr'; try{ l=localStorage.getItem('school-lang')||'mr'; }catch(e){}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){schoolSetLang(l)}); else schoolSetLang(l); })();
+</script></body>
 </html>
