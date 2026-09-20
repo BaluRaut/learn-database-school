@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before & trade-offs — Learn Database School</title>
+<meta name="description" content="For every big database idea: what came before, merits and demerits, and where to use it vs where not.">
+<meta property="og:title" content="Before & trade-offs — Learn Database School">
+<meta property="og:description" content="For every big database idea: what came before, merits and demerits, and where to use it vs where not.">
+<meta property="og:image" content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#b45309; --ok:#16a34a; --blue:#2563eb; --bad:#dc2626; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0b1220; --card:#131c2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#253349; } }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.6; }
+  .wrap { max-width:1280px; margin:0 auto; padding:28px 20px 60px; }
+  @media (min-width: 1660px) { .wrap { max-width: 1580px; } }
+  a { color:var(--blue); } h1 { font-size:2rem; line-height:1.25; } h2 { font-size:1.4rem; margin:44px 0 6px; }
+  .sub { color:var(--muted); max-width:74ch; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 8px; }
+  .chip { border:1px solid var(--line); background:var(--card); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-top:16px; }
+  .lesson { background:var(--card); border:1px solid var(--line); border-top:5px solid var(--c,var(--accent)); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .lesson .top { display:flex; align-items:center; gap:10px; }
+  .lesson .num { flex:none; width:30px; height:30px; border-radius:50%; background:var(--c,var(--accent)); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; }
+  .lesson h3 { font-size:1.02rem; line-height:1.3; } .lesson .ana { color:var(--muted); font-size:.9rem; }
+  .lesson code { font-size:.78rem; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:1px 6px; }
+  .lesson a.go { margin-top:auto; font-weight:600; font-size:.9rem; text-decoration:none; } .lesson a.go+a.go { margin-top:0; } .lesson a.go:hover { text-decoration:underline; }
+  .callout { background:var(--card); border:1px solid var(--line); border-left:6px solid var(--ok); border-radius:14px; padding:18px 20px; margin-top:16px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; overflow-x:auto; font-size:.88rem; margin-top:12px; }
+  .btn { display:inline-block; background:var(--accent); color:#fff; border-radius:10px; padding:10px 18px; text-decoration:none; font-weight:700; margin:14px 10px 0 0; }
+  .btn.alt { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .vs { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:16px; }
+  .vcol { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; } .vcol h3 { margin-bottom:8px; }
+  .vcol ul { margin-left:18px; color:var(--muted); font-size:.93rem; }
+  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:12px} .tbl table{border-collapse:collapse;width:100%;font-size:.9rem} .tbl th,.tbl td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} .tbl th{background:var(--bg)}
+  footer { margin-top:56px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:.88rem; }
+
+  .term { background:var(--card); border:1px solid var(--line); border-top:6px solid var(--c,var(--accent)); border-radius:16px; padding:22px; margin-top:26px; scroll-margin-top:16px; }
+  .term h2 { font-size:1.3rem; margin-bottom:10px; }
+  .hist { background:var(--bg); border-left:5px solid var(--c,var(--accent)); border-radius:10px; padding:14px 16px; margin:10px 0 14px; }
+  .hist b { display:block; margin-bottom:4px; } .hist p { color:var(--muted); font-size:.95rem; }
+  .quad { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+  .q { border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .q h4 { margin-bottom:6px; font-size:.98rem; } .q ul { margin-left:18px; color:var(--muted); font-size:.92rem; }
+  .q.merit { border-top:4px solid var(--ok); } .q.demerit { border-top:4px solid var(--bad); }
+  .q.use { border-top:4px solid var(--blue); } .q.avoid { border-top:4px solid #f59e0b; }
+
+  .toc { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 6px; }
+  .toc a { border:1px solid var(--line); background:var(--card); border-radius:999px; padding:5px 12px; font-size:.82rem; color:var(--muted); text-decoration:none; }
+  .toc a:hover { color:var(--ink); border-color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <p><a href="index.html">← Back to the course home</a></p>
+  <h1>⏮️ Before &amp; trade-offs</h1>
+  <p class="sub">Every tool replaced something worse — and is itself the wrong tool somewhere. For each big idea: what life was like <b>before</b>, honest <b>merits ✅ / demerits ❌</b>, and <b>where to use it 👍 vs not 👎</b>.</p>
+  <nav class="toc"><a href="#sql">🗄️ Relational vs NoSQL</a><a href="#norm">🧩 Normalise vs denormalise</a><a href="#idx">🗂️ Indexes</a><a href="#iso">🔒 Isolation levels</a><a href="#mig">🏗️ Expand/contract migrations</a><a href="#scale">📈 Replicas vs sharding</a><a href="#managed">☁️ Managed vs self-hosted</a></nav>
+</header>
+
+<section class="term" id="sql" style="--c:#b45309">
+  <h2>🗄️ Relational (SQL) vs NoSQL — lessons 02, 11</h2>
+  <div class="hist"><b>⏮️ Before relational databases (1970s) and before the NoSQL wave (2009)</b><p>Records lived in files with app-specific layouts; every program parsed its own format and nobody could ask a new question without new code. Relational databases put the questions into SQL. Then web scale made some teams throw the constraints away for speed — and many later bought them back.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>constraints make bad data impossible, not merely unlikely</li><li>JOINs and transactions answer new questions without new code</li><li>one mature room (Postgres) serves most apps for years</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>schema changes need migrations (lesson 08)</li><li>JOIN-heavy queries need care at scale</li><li>horizontal write scaling is hard (lesson 10)</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>anything with relationships, money, or rules — the default</li><li>reporting and ad-hoc questions</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>a question the relational shape answers badly: nearest-by-meaning, graph hops, billions of appends</li><li>'NoSQL because scale' with no measurement — the classic regret</li></ul></div>
+  </div>
+</section>
+<section class="term" id="norm" style="--c:#b45309">
+  <h2>🧩 Normalise vs denormalise — lesson 05</h2>
+  <div class="hist"><b>⏮️ Before normal forms</b><p>One big spreadsheet-shaped table: a teacher's phone number copied into 30 rows, updated in 29, and a report that was wrong for a year.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>one fact, one place: updates cannot disagree</li><li>smaller rows, cleaner constraints</li><li>the schema documents the domain</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>more JOINs per screen</li><li>read-heavy pages may need several queries</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>the source of truth; anything edited</li><li>early — it is much easier to denormalise later than the reverse</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>a hot read path where a measured JOIN is the bottleneck — copy the value and own the rule that keeps it true</li><li>analytics tables that are rebuilt, not edited</li></ul></div>
+  </div>
+</section>
+<section class="term" id="idx" style="--c:#b45309">
+  <h2>🗂️ Indexes — lesson 06</h2>
+  <div class="hist"><b>⏮️ Before the card catalogue</b><p>Every question read every line. Fine at 5 rows; the 200,000-row attendance table took a full scan per lookup.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>SEARCH instead of SCAN: milliseconds to microseconds</li><li>enforce uniqueness (UNIQUE) as a side effect</li><li>make ORDER BY and JOIN cheap</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>every write updates every index</li><li>space; and a wrong column order helps nobody</li><li>the planner may ignore an index on tiny tables</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>columns you filter, join and sort on; foreign keys</li><li>after EXPLAIN shows a SCAN on a big table</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>'index everything' — writes crawl</li><li>before measuring — a 5-row table needs no catalogue</li></ul></div>
+  </div>
+</section>
+<section class="term" id="iso" style="--c:#1d4ed8">
+  <h2>🔒 Isolation levels — lesson 07</h2>
+  <div class="hist"><b>⏮️ Before isolation</b><p>Two clerks writing the same register at once produced torn rows; the fix was 'only one program uses the file' — until there were two programs.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>read committed: fast, no dirty reads — the sane default</li><li>serializable: correctness as if one clerk at a time</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>stricter levels wait more and deadlock more</li><li>subtle anomalies (phantoms, lost updates) at the looser levels</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>money and counters: serializable or explicit locks (SELECT … FOR UPDATE)</li><li>everything else: read committed + short transactions</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>long transactions holding locks across user think-time</li><li>assuming your ORM's default is serializable — it almost never is</li></ul></div>
+  </div>
+</section>
+<section class="term" id="mig" style="--c:#1d4ed8">
+  <h2>🏗️ Expand/contract migrations — lesson 08</h2>
+  <div class="hist"><b>⏮️ Before versioned migrations</b><p>Someone ran ALTER TABLE on the production room by hand on a Friday; nobody could say what the schema was, and rollback meant memory.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>schema in git: reviewable, repeatable, rehearsable</li><li>expand → migrate → contract keeps school open through a rename</li><li>the logbook (schema_migrations) makes 'what ran where' a query</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>discipline: one migration = one change, always reversible or rehearsed</li><li>backfills on big tables must be batched</li><li>two code versions run at once for a while</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>every schema change, no exceptions</li><li>zero-downtime renames and type changes</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>a one-step rename on a live table — it breaks the old code instantly</li><li>destructive migrations without a tested backup (lesson 09)</li></ul></div>
+  </div>
+</section>
+<section class="term" id="scale" style="--c:#1d4ed8">
+  <h2>📈 Read replicas vs sharding — lesson 10</h2>
+  <div class="hist"><b>⏮️ Before replicas</b><p>One machine; when it filled up, the answer was a bigger machine — until there was no bigger machine.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>replicas: cheap read scaling and a warm standby</li><li>sharding: writes and data spread across rooms — the last resort that works</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>replication lag: a reader may see the past</li><li>sharding breaks JOINs and cross-shard transactions; re-sharding is a project</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>replicas for read-heavy apps and reporting</li><li>sharding when one primary genuinely cannot hold the writes — after pool, cache, indexes, bigger box</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>reading your own write from a replica (lag surprises)</li><li>sharding a 50 GB database because a blog said so</li></ul></div>
+  </div>
+</section>
+<section class="term" id="managed" style="--c:#1d4ed8">
+  <h2>☁️ Managed (RDS) vs self-hosted — lessons 09, 10</h2>
+  <div class="hist"><b>⏮️ Before managed databases</b><p>Every team ran its own Postgres: patching, backups, failover scripts, and one person who knew where the WAL went.</p></div>
+  <div class="quad">
+    <div class="q merit"><h4>✅ Merits</h4><ul><li>backups, patches, Multi-AZ failover, monitoring — rented</li><li>replicas and point-in-time restore are checkboxes</li></ul></div>
+    <div class="q demerit"><h4>❌ Demerits</h4><ul><li>costs more per hour; less knob access</li><li>lock-in flavours; migration effort later</li><li>you still own the schema, queries, indexes and drills</li></ul></div>
+    <div class="q use"><h4>👍 Use when</h4><ul><li>most teams, most of the time (AWS school L17)</li><li>when the one person who knew the WAL leaves</li></ul></div>
+    <div class="q avoid"><h4>👎 Think twice when</h4><ul><li>exotic extensions or extreme tuning the service forbids</li><li>a laptop lab — SQLite is free and honest</li></ul></div>
+  </div>
+</section>
+<footer>
+  Learn Database School · the record room is in the repo · <a href="index.html">Course home</a> · <a href="lesson-diagrams.html">Lesson diagrams</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 the Dictionary</a> · <a href="https://baluraut.github.io/school/">🏫 all schools</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 found a mistake?</a>
+</footer>
+</div>
+</body>
+</html>

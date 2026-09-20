@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study plan — Learn Database School</title>
+<meta name="description" content="A 4-week study plan for the 12-lesson database course: sequence, time estimates, weekly milestones — progress saved in your browser.">
+<meta property="og:title" content="Study plan — Learn Database School">
+<meta property="og:description" content="A 4-week study plan for the 12-lesson database course: sequence, time estimates, weekly milestones — progress saved in your browser.">
+<meta property="og:image" content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#b45309; --ok:#16a34a; --blue:#2563eb; --bad:#dc2626; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0b1220; --card:#131c2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#253349; } }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.6; }
+  .wrap { max-width:1280px; margin:0 auto; padding:28px 20px 60px; }
+  @media (min-width: 1660px) { .wrap { max-width: 1580px; } }
+  a { color:var(--blue); } h1 { font-size:2rem; line-height:1.25; } h2 { font-size:1.4rem; margin:44px 0 6px; }
+  .sub { color:var(--muted); max-width:74ch; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 8px; }
+  .chip { border:1px solid var(--line); background:var(--card); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-top:16px; }
+  .lesson { background:var(--card); border:1px solid var(--line); border-top:5px solid var(--c,var(--accent)); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .lesson .top { display:flex; align-items:center; gap:10px; }
+  .lesson .num { flex:none; width:30px; height:30px; border-radius:50%; background:var(--c,var(--accent)); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; }
+  .lesson h3 { font-size:1.02rem; line-height:1.3; } .lesson .ana { color:var(--muted); font-size:.9rem; }
+  .lesson code { font-size:.78rem; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:1px 6px; }
+  .lesson a.go { margin-top:auto; font-weight:600; font-size:.9rem; text-decoration:none; } .lesson a.go+a.go { margin-top:0; } .lesson a.go:hover { text-decoration:underline; }
+  .callout { background:var(--card); border:1px solid var(--line); border-left:6px solid var(--ok); border-radius:14px; padding:18px 20px; margin-top:16px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; overflow-x:auto; font-size:.88rem; margin-top:12px; }
+  .btn { display:inline-block; background:var(--accent); color:#fff; border-radius:10px; padding:10px 18px; text-decoration:none; font-weight:700; margin:14px 10px 0 0; }
+  .btn.alt { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .vs { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:16px; }
+  .vcol { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; } .vcol h3 { margin-bottom:8px; }
+  .vcol ul { margin-left:18px; color:var(--muted); font-size:.93rem; }
+  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:12px} .tbl table{border-collapse:collapse;width:100%;font-size:.9rem} .tbl th,.tbl td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} .tbl th{background:var(--bg)}
+  footer { margin-top:56px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:.88rem; }
+
+  .paces { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:18px 0 8px; }
+  .pace { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; font-size:.93rem; color:var(--muted); }
+  .pace b { color:var(--ink); }
+  .progress-box { position:sticky; top:0; z-index:10; background:var(--bg); padding:12px 0; }
+  .progress-inner { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 18px; display:flex; align-items:center; gap:16px; }
+  .bar { flex:1; height:12px; background:var(--line); border-radius:999px; overflow:hidden; }
+  .bar > div { height:100%; width:0%; background:var(--ok); border-radius:999px; transition:width .3s; }
+  #ptext { font-weight:700; white-space:nowrap; }
+  .week { background:var(--card); border:1px solid var(--line); border-left:6px solid var(--c,var(--accent)); border-radius:16px; padding:20px 22px; margin-top:22px; }
+  .week h2 { font-size:1.15rem; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:0; }
+  .week h2 .wk { flex:none; font-size:.8rem; font-weight:800; color:#fff; background:var(--c,var(--accent)); border-radius:999px; padding:3px 12px; }
+  .week .goal { color:var(--muted); font-size:.93rem; margin:6px 0 12px; }
+  .lesson-row { display:flex; align-items:baseline; gap:10px; padding:7px 0; border-top:1px dashed var(--line); font-size:.95rem; }
+  .lesson-row input { transform:scale(1.25); accent-color:var(--ok); flex:none; position:relative; top:2px; }
+  .lesson-row .time { margin-left:auto; color:var(--muted); font-size:.85rem; white-space:nowrap; }
+  .lesson-row a { text-decoration:none; font-weight:600; } .lesson-row a:hover { text-decoration:underline; }
+  .milestone { margin-top:12px; background:var(--bg); border-left:4px solid var(--ok); border-radius:8px; padding:10px 14px; font-size:.92rem; }
+  .milestone b { color:var(--ok); }
+  #done { display:none; text-align:center; background:var(--card); border:2px solid var(--ok); border-radius:20px; padding:32px 24px; margin-top:26px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <p><a href="index.html">← Back to the course home</a></p>
+  <h1>🗓️ The study plan — 12 lessons, 4 weeks</h1>
+  <p class="sub">~<b>3 sessions a week</b>: read the lesson (~15 min) + run and change its section of db/demo.py (~25 min). Tick lessons off — <b>progress is saved in this browser</b>.</p>
+  <div class="paces"><div class="pace">🐢 <b>Steady:</b> 3 sessions/week → done in 4 weeks.</div><div class="pace">🐇 <b>Fast track:</b> one weekend per part → done in 2 weekends.</div><div class="pace">💰 <b>Cost:</b> zero. Python 3's built-in SQLite on your laptop.</div></div>
+</header>
+<div class="progress-box"><div class="progress-inner"><span id="ptext">0 / 12</span><div class="bar"><div id="pbar"></div></div></div></div>
+<section class="week" style="--c:#b45309">
+  <h2><span class="wk">WEEK 1</span> 🗄️ The record room — registers, keys, questions</h2>
+  <p class="goal">Why a database, tables and keys, SQL reads. Lab: build school.db, run reads and join, write two queries of your own.</p>
+  <div class="lesson-row"><input type="checkbox" data-l="l01" id="sl01"><label for="sl01"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md">01 · 🗄️ Why databases</a></label><span class="time">~35 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l02" id="sl02"><label for="sl02"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-02-tables-rows-keys/lessons/02-tables-rows-keys/README.md">02 · 📇 Tables, rows &amp; keys</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l03" id="sl03"><label for="sl03"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-03-sql-reads/lessons/03-sql-reads/README.md">03 · 🔍 SQL reads</a></label><span class="time">~45 min</span></div>
+  <div class="milestone">🏁 <b>Checkpoint:</b> you can draw the class → student → grade registers with their keys, and write a JOIN that answers 'every 3A maths grade' by hand.</div>
+</section>
+<section class="week" style="--c:#b45309">
+  <h2><span class="wk">WEEK 2</span> ✏️ The ledger, the shape, the catalogue</h2>
+  <p class="goal">Transactions, modelling, indexes. Lab: make a transaction fail on purpose; break a constraint; race a query with and without an index.</p>
+  <div class="lesson-row"><input type="checkbox" data-l="l04" id="sl04"><label for="sl04"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-04-transactions/lessons/04-transactions/README.md">04 · ✏️ Writes &amp; transactions</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l05" id="sl05"><label for="sl05"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-05-data-modelling/lessons/05-data-modelling/README.md">05 · 🧩 Data modelling</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l06" id="sl06"><label for="sl06"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-06-indexes/lessons/06-indexes/README.md">06 · 🗂️ Indexes</a></label><span class="time">~40 min</span></div>
+  <div class="milestone">🏁 <b>Checkpoint:</b> your failed transaction left both rows untouched; the schema refused a duplicate roll number; EXPLAIN turned a SCAN into a SEARCH and you saw the time drop.</div>
+</section>
+<section class="week" style="--c:#1d4ed8">
+  <h2><span class="wk">WEEK 3</span> 🔒 Two clerks, renovations, the fireproof copy</h2>
+  <p class="goal">Concurrency, migrations, backups. Lab: hold a lock from a second connection; write migration 004; delete a row and restore it from your copy.</p>
+  <div class="lesson-row"><input type="checkbox" data-l="l07" id="sl07"><label for="sl07"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-07-concurrency/lessons/07-concurrency/README.md">07 · 🔒 Concurrency &amp; isolation</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l08" id="sl08"><label for="sl08"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-08-migrations/lessons/08-migrations/README.md">08 · 🏗️ Migrations</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l09" id="sl09"><label for="sl09"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-09-backups-recovery/lessons/09-backups-recovery/README.md">09 · 🧯 Backups &amp; recovery</a></label><span class="time">~35 min</span></div>
+  <div class="milestone">🏁 <b>Checkpoint:</b> you saw 'database is locked' and explained it; migrate.py applied your 004 once and never again; Rohan came back from the backup you tested.</div>
+</section>
+<section class="week" style="--c:#1d4ed8">
+  <h2><span class="wk">WEEK 4</span> 📈 Scaling, other rooms, on call</h2>
+  <p class="goal">Scaling ladder, NoSQL rooms, performance and operations. Lab: fix the N+1; write the on-call checklist for school.db.</p>
+  <div class="lesson-row"><input type="checkbox" data-l="l10" id="sl10"><label for="sl10"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-10-scaling/lessons/10-scaling/README.md">10 · 📈 Scaling</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l11" id="sl11"><label for="sl11"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-11-nosql-other-rooms/lessons/11-nosql-other-rooms/README.md">11 · 🏘️ NoSQL &amp; other rooms</a></label><span class="time">~40 min</span></div>
+  <div class="lesson-row"><input type="checkbox" data-l="l12" id="sl12"><label for="sl12"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-12-performance-ops/lessons/12-performance-ops/README.md">12 · 🩺 Performance &amp; operations</a></label><span class="time">~45 min</span></div>
+  <div class="milestone">🏁 <b>Checkpoint:</b> 🏆 <b>Capstone:</b> add a teachers table with a foreign key, an index, a migration and a query — then explain out loud what breaks first as the school grows, and what you would do about it, in order.</div>
+</section>
+<div id="done">
+  <h2>🎓 12 / 12 — the record room is yours!</h2>
+  <p class="sub" style="margin:10px auto 0">Next: the <a href="https://baluraut.github.io/learn-api-school/">API school</a> puts a counter in front of this room, the <a href="https://baluraut.github.io/learn-vectordb-school/">VectorDB school</a> opens the meaning hall next door, and the <a href="https://baluraut.github.io/school/">School portal</a> has the rest.</p>
+</div>
+<footer>
+  Learn Database School · the record room is in the repo · <a href="index.html">Course home</a> · <a href="lesson-diagrams.html">Lesson diagrams</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 the Dictionary</a> · <a href="https://baluraut.github.io/school/">🏫 all schools</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 found a mistake?</a>
+</footer>
+</div>
+<script>
+(function(){
+  var KEY='plan-learn-database-school', state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+  var boxes=[].slice.call(document.querySelectorAll('input[data-l]'));
+  function render(){
+    var done=boxes.filter(function(b){return b.checked}).length;
+    document.getElementById('ptext').textContent=done+' / '+boxes.length;
+    document.getElementById('pbar').style.width=(100*done/boxes.length)+'%';
+    document.getElementById('done').style.display=done===boxes.length?'block':'none';
+  }
+  boxes.forEach(function(b){
+    b.checked=!!state[b.dataset.l];
+    b.addEventListener('change',function(){state[b.dataset.l]=b.checked;
+      localStorage.setItem(KEY,JSON.stringify(state));render();});
+  });
+  render();
+})();
+</script>
+</body>
+</html>

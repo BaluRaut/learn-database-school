@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learn databases the school way — the record room</title>
+<meta name="description" content="12 branch-by-branch database lessons: tables and keys, SQL, transactions, modelling, indexes, concurrency, migrations, backups, scaling, NoSQL, performance — ELI5 school analogies, diagrams and a zero-dependency SQLite lab.">
+<meta property="og:title" content="Learn databases the school way — the record room">
+<meta property="og:description" content="12 branch-by-branch database lessons: tables and keys, SQL, transactions, modelling, indexes, concurrency, migrations, backups, scaling, NoSQL, performance — ELI5 school analogies, diagrams and a zero-dependency SQLite lab.">
+<meta property="og:image" content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#b45309; --ok:#16a34a; --blue:#2563eb; --bad:#dc2626; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0b1220; --card:#131c2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#253349; } }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.6; }
+  .wrap { max-width:1280px; margin:0 auto; padding:28px 20px 60px; }
+  @media (min-width: 1660px) { .wrap { max-width: 1580px; } }
+  a { color:var(--blue); } h1 { font-size:2rem; line-height:1.25; } h2 { font-size:1.4rem; margin:44px 0 6px; }
+  .sub { color:var(--muted); max-width:74ch; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 8px; }
+  .chip { border:1px solid var(--line); background:var(--card); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-top:16px; }
+  .lesson { background:var(--card); border:1px solid var(--line); border-top:5px solid var(--c,var(--accent)); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .lesson .top { display:flex; align-items:center; gap:10px; }
+  .lesson .num { flex:none; width:30px; height:30px; border-radius:50%; background:var(--c,var(--accent)); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; }
+  .lesson h3 { font-size:1.02rem; line-height:1.3; } .lesson .ana { color:var(--muted); font-size:.9rem; }
+  .lesson code { font-size:.78rem; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:1px 6px; }
+  .lesson a.go { margin-top:auto; font-weight:600; font-size:.9rem; text-decoration:none; } .lesson a.go+a.go { margin-top:0; } .lesson a.go:hover { text-decoration:underline; }
+  .callout { background:var(--card); border:1px solid var(--line); border-left:6px solid var(--ok); border-radius:14px; padding:18px 20px; margin-top:16px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; overflow-x:auto; font-size:.88rem; margin-top:12px; }
+  .btn { display:inline-block; background:var(--accent); color:#fff; border-radius:10px; padding:10px 18px; text-decoration:none; font-weight:700; margin:14px 10px 0 0; }
+  .btn.alt { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .vs { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:16px; }
+  .vcol { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; } .vcol h3 { margin-bottom:8px; }
+  .vcol ul { margin-left:18px; color:var(--muted); font-size:.93rem; }
+  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:12px} .tbl table{border-collapse:collapse;width:100%;font-size:.9rem} .tbl th,.tbl td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} .tbl th{background:var(--bg)}
+  footer { margin-top:56px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:.88rem; }
+
+  .dsec { background:var(--card); border:1px solid var(--line); border-top:6px solid var(--c,var(--accent)); border-radius:16px; padding:22px 22px 16px; margin-top:26px; scroll-margin-top:16px; }
+  .dsec h2 { font-size:1.25rem; display:flex; align-items:center; gap:10px; }
+  .dsec h2 .ln { flex:none; width:32px; height:32px; border-radius:50%; background:var(--c,var(--accent)); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:.95rem; font-weight:800; }
+  .dsec p.d { color:var(--muted); font-size:.95rem; margin:6px 0 4px; }
+  .dsec svg { width:100%; height:auto; display:block; margin-top:10px; } .dsec .foot { margin-top:8px; font-size:.92rem; }
+  .box { fill:var(--card); stroke:var(--c,var(--accent)); stroke-width:2; }
+  .soft { fill:var(--bg); stroke:var(--line); stroke-width:1.5; }
+  .dead { fill:var(--bg); stroke:var(--muted); stroke-width:1.5; stroke-dasharray:6 5; }
+  .t { font:600 14px -apple-system,"Segoe UI",sans-serif; fill:var(--ink); }
+  .s { font:12px -apple-system,"Segoe UI",sans-serif; fill:var(--muted); } .m { text-anchor:middle; }
+  .arr { stroke:#64748b; stroke-width:2; fill:none; marker-end:url(#arw); } .dash { stroke-dasharray:6 5; }
+  .nc { fill:var(--c,var(--accent)); } .nt { font:700 12px -apple-system,sans-serif; fill:#fff; text-anchor:middle; }
+  @media print { .btn, footer { display:none; } .dsec { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker></defs></svg>
+<div class="wrap">
+  <header>
+    <h1>🗄️ Learn databases the school way</h1>
+    <p class="sub">Where the school keeps its truth, taught as the <b>record room</b>: registers, line numbers, a ledger in pencil, a card catalogue, a fireproof copy. Every lesson is a school story with a numbered diagram — and the record room is <b>in the repo</b>: a real SQLite database (Python's built-in <code>sqlite3</code>, zero dependencies) that every lesson queries, breaks and repairs.</p>
+    <div class="chips"><span class="chip">📇 tables & keys</span><span class="chip">🔍 SQL</span><span class="chip">✏️ transactions</span><span class="chip">🗂️ indexes</span><span class="chip">🔒 isolation</span><span class="chip">🏗️ migrations</span><span class="chip">🧯 backups</span><span class="chip">🏘️ NoSQL</span></div>
+  </header>
+  <div class="vs"><div class="vcol" style="border-top:5px solid #b45309"><h3>📇 Part 1 — THE RECORD ROOM (1–6)</h3><ul><li>why a record room beats sticky notes 🗄️</li><li>registers, line numbers, keys 📇</li><li>asking the archivist: SQL, JOINs 🔍</li><li>the ledger in pencil, one fact one place, the catalogue ✏️🧩🗂️</li></ul></div><div class="vcol" style="border-top:5px solid #1d4ed8"><h3>🏃 Part 2 — RUNNING IT (7–12)</h3><ul><li>two clerks, one register 🔒</li><li>renovating while school is open 🏗️</li><li>the fireproof copy, more clerks and rooms 🧯📈</li><li>other rooms, and the on-call checklist 🏘️🩺</li></ul></div></div>
+  <pre><code># the 60-second wow — every lesson's queries, live:
+git clone https://github.com/BaluRaut/learn-database-school.git &amp;&amp; cd learn-database-school
+python3 db/demo.py                 # builds school.db and runs reads, joins, a rollback, an index race, a lock, a restore…
+python3 db/migrate.py              # renovates the room: three migrations, once each</code></pre>
+  <p class="sub" style="margin-top:10px"><b>What you should see</b> (trimmed — success looks like this):</p>
+  <pre><code>🗄️  school.db built from schema.sql + seed.sql
+
+═══ reads ═══
+── SELECT … WHERE … ORDER BY … LIMIT
+    (&#x27;Aarav&#x27;, &#x27;3A-01&#x27;)
+    (&#x27;Kabir&#x27;, &#x27;3A-03&#x27;)
+
+═══ join ═══
+── JOIN — cross-referencing three registers
+    (&#x27;Aarav&#x27;, &#x27;3A&#x27;, &#x27;maths&#x27;, &#x27;A&#x27;)
+    (&#x27;Meera&#x27;, &#x27;3B&#x27;, &#x27;maths&#x27;, &#x27;A&#x27;)
+    (&#x27;Sita&#x27;, &#x27;3A&#x27;, &#x27;maths&#x27;, &#x27;A+&#x27;)
+    (&#x27;Rohan&#x27;, &#x27;3B&#x27;, &#x27;maths&#x27;, &#x27;B&#x27;)
+    (&#x27;Kabir&#x27;, &#x27;3A&#x27;, &#x27;maths&#x27;, &#x27;B+&#x27;)
+
+── GROUP BY — one row per class
+    (&#x27;3A&#x27;, 3)
+    (&#x27;3B&#x27;, 2)
+
+═══ txn ═══
+── before the transfer
+    (&#x27;Aarav&#x27;, 1)
+    (&#x27;Meera&#x27;, 2)
+
+   💥 second update failed: FOREIGN KEY constraint failed → ROLLBACK
+
+── after — the pencil was erased, BOTH changes gone
+    (&#x27;Aarav&#x27;, 1)
+    (&#x27;Meera&#x27;, 2)
+
+═══ model ═══
+── one fact, one place — the class name lives in ONE row
+    (1, &#x27;3A&#x27;)
+    (2, &#x27;3B&#x27;)
+
+   💥 duplicate roll_no refused by the schema: UNIQUE constraint failed: students.roll_no 
+
+   💥 impossible grade refused by CHECK: CHECK constraint failed: grade IN (&#x27;A+&#x27;,&#x27;A&#x27;,&#x27;B+&#x27;,&#x27;B&#x27;,&#x27;C&#x27;) 
+
+═══ index ═══
+── without an index: SCAN attendance → 48 rows in 2.4 ms
+── with the card catalogue: SEARCH attendance USING COVERING INDEX idx_attendance_student (student_id=?) → 48 rows in 0.0 ms
+
+═══ locks ═══
+── clerk 1 reads while clerk 2&#x27;s change is uncommitted (isolation)
+    (2, &#x27;Sita&#x27;)
+
+   ⏳ clerk 1 waited, then: database is locked — the lock protects the register
+
+═══ backup ═══
+── after the accident — Rohan is gone
+    (1, &#x27;Aarav&#x27;)
+    (2, &#x27;Sita&#x27;)
+    (3, &#x27;Kabir&#x27;)
+    (4, &#x27;Meera&#x27;)
+
+── after the restore — from the copy we tested
+    (1, &#x27;Aarav&#x27;)
+    (2, &#x27;Sita&#x27;)
+    (3, &#x27;Kabir&#x27;)
+    (4, &#x27;Meera&#x27;)
+    (5, &#x27;Rohan&#x27;)
+
+═══ nplus1 ═══
+── N+1: 6 queries, 0.10 ms · one JOIN: 1 query, 0.04 ms — same answer [(&#x27;Aarav&#x27;, 2), (&#x27;Sita&#x27;, 2)]…
+
+✅ done — the record room survived every lesson</code></pre>
+  <div class="callout" id="setup">🎒 <b>Before lesson 01:</b> you need <b>Python 3</b> — its built-in <code>sqlite3</code> is the whole record room; no server, no Docker, no cloud. Good neighbours: the <a href="https://baluraut.github.io/learn-api-school/">API school</a> (the counter in front of this room), the <a href="https://baluraut.github.io/learn-aws-school/">AWS school</a>'s RDS lesson (renting the room) and the <a href="https://baluraut.github.io/learn-vectordb-school/">VectorDB school</a> (the meaning hall next door). <b>What this is not:</b> a Postgres administration manual — the ideas are the same in Postgres, MySQL and SQLite; the lessons say where they differ.</div>
+  <h2 id="big-picture">🗺️ The big picture — one diagram, the whole course</h2>
+  <p class="sub">The whole course on one canvas. Click for the <a href="images/big-picture-4k.png">4K version</a>.</p>
+  <figure style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:16px">
+    <a href="images/big-picture-4k.png"><img src="images/big-picture.svg" alt="The big picture: the record room (tables, keys, SQL, transactions, modelling, indexes) and running it (concurrency, migrations, backups, scaling, NoSQL, operations)" loading="lazy" style="width:100%;height:auto;border-radius:8px;background:#fff"></a>
+  </figure>
+
+  <h2 id="part1">📇 Part 1 — the record room (lessons 1–6)</h2>
+  <p class="sub">One git branch = one idea; branch 04 contains lessons 01–04. Labs run with plain Python 3 — no database server to install.</p>
+  <div class="grid">
+    <div class="lesson" style="--c:#b45309"><div class="top"><span class="num">1</span><h3>🗄️ Why databases</h3></div><span class="ana">The record room vs sticky notes — durable, shared, and answerable by question.</span><code>lesson-01-why-databases</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l01">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#b45309"><div class="top"><span class="num">2</span><h3>📇 Tables, rows &amp; keys</h3></div><span class="ana">Registers with numbered lines — primary keys, foreign keys, the class → student → grade shape.</span><code>lesson-02-tables-rows-keys</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-02-tables-rows-keys/lessons/02-tables-rows-keys/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l02">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#b45309"><div class="top"><span class="num">3</span><h3>🔍 SQL reads</h3></div><span class="ana">Asking the archivist — SELECT, WHERE, ORDER BY, LIMIT, and JOIN across registers.</span><code>lesson-03-sql-reads</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-03-sql-reads/lessons/03-sql-reads/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l03">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#b45309"><div class="top"><span class="num">4</span><h3>✏️ Writes &amp; transactions</h3></div><span class="ana">The ledger in pencil — INSERT, UPDATE, DELETE, and the eraser (ROLLBACK) that makes ACID real.</span><code>lesson-04-transactions</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-04-transactions/lessons/04-transactions/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l04">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#b45309"><div class="top"><span class="num">5</span><h3>🧩 Data modelling</h3></div><span class="ana">One fact, one place — normalisation, constraints, and when to break the rule on purpose.</span><code>lesson-05-data-modelling</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-05-data-modelling/lessons/05-data-modelling/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l05">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#b45309"><div class="top"><span class="num">6</span><h3>🗂️ Indexes</h3></div><span class="ana">The card catalogue — B-trees, EXPLAIN, and when a catalogue slows you down.</span><code>lesson-06-indexes</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-06-indexes/lessons/06-indexes/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l06">See the diagram ↗</a></div>
+  </div>
+  <h2 id="part2">🏃 Part 2 — running the record room for real (lessons 7–12)</h2>
+  <p class="sub">Everything a production database needs, each one demonstrated on the same little school database.</p>
+  <div class="grid">
+    <div class="lesson" style="--c:#1d4ed8"><div class="top"><span class="num">7</span><h3>🔒 Concurrency &amp; isolation</h3></div><span class="ana">Two clerks, one register — locks, isolation levels, and the deadlock handshake.</span><code>lesson-07-concurrency</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-07-concurrency/lessons/07-concurrency/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l07">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#1d4ed8"><div class="top"><span class="num">8</span><h3>🏗️ Migrations</h3></div><span class="ana">Renovating the room while school is open — versioned scripts, expand then contract.</span><code>lesson-08-migrations</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-08-migrations/lessons/08-migrations/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l08">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#1d4ed8"><div class="top"><span class="num">9</span><h3>🧯 Backups &amp; recovery</h3></div><span class="ana">The fireproof copy — RPO, RTO, point-in-time, and the restore drill you actually run.</span><code>lesson-09-backups-recovery</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-09-backups-recovery/lessons/09-backups-recovery/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l09">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#1d4ed8"><div class="top"><span class="num">10</span><h3>📈 Scaling</h3></div><span class="ana">More clerks, more rooms — pools, replicas, caches, partitions, and when not to shard.</span><code>lesson-10-scaling</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-10-scaling/lessons/10-scaling/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l10">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#1d4ed8"><div class="top"><span class="num">11</span><h3>🏘️ NoSQL &amp; other rooms</h3></div><span class="ana">Document, key-value, columnar, graph, vector — choosing the room for the question.</span><code>lesson-11-nosql-other-rooms</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-11-nosql-other-rooms/lessons/11-nosql-other-rooms/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l11">See the diagram ↗</a></div>
+    <div class="lesson" style="--c:#1d4ed8"><div class="top"><span class="num">12</span><h3>🩺 Performance &amp; operations</h3></div><span class="ana">Slow-query triage, N+1, observability — the checklist before the record room goes on call.</span><code>lesson-12-performance-ops</code><a class="go" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-12-performance-ops/lessons/12-performance-ops/README.md">Read lesson →</a><a class="go" href="lesson-diagrams.html#l12">See the diagram ↗</a></div>
+  </div>
+
+  <div class="callout" id="prompts">🗣️ <b>Explain this out loud — after lesson 12:</b> (1) Why does a foreign key make a bad row impossible rather than merely unlikely? (2) A transaction updates two rows and the second fails — what is on disk afterwards, and why? (3) When does adding an index make a system slower? (4) Two clerks, one row: what does isolation hide, and what does a deadlock look like? (5) Rename a column without downtime — say the four steps. (6) RPO and RTO in one sentence each, and the date of your last restore drill.</div>
+  <div class="callout">🎓 <b>From the same school:</b> <a href="https://baluraut.github.io/learn-api-school/">API</a> · <a href="https://baluraut.github.io/learn-ui-school/">UI</a> · <a href="https://baluraut.github.io/learn-vectordb-school/">VectorDB</a> · <a href="https://baluraut.github.io/learn-aws-school/">AWS</a> · <a href="https://baluraut.github.io/learn-kubernetes-school/">Kubernetes</a> — same analogy universe, same branch-by-branch method.</div>
+  <h2 id="diagrams">📐 The lesson diagrams — follow the numbers</h2>
+  <p class="sub">Every lesson as one numbered box-and-arrow diagram — also on a <a href="lesson-diagrams.html">standalone page</a>.</p>
+
+<!-- 01 -->
+<section class="dsec" id="l01" style="--c:#b45309">
+  <h2><span class="ln">1</span> 🗄️ Why databases</h2>
+  <p class="d">The record room vs sticky notes — durable, shared, and answerable by question.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="dead" x="40" y="60" width="330" height="170" rx="14"/><text class="t m" x="205" y="92">📝 sticky notes and spreadsheets</text><text class="s m" x="205" y="120">one file per app · overwritten by the last</text><text class="s m" x="205" y="142">save · no one can ask &#39;every 3A student</text><text class="s m" x="205" y="164">with an A&#39; · the laptop dies, the notes die</text><text class="s m" x="205" y="196">= no durability, no sharing, no questions</text><g transform="translate(40,60)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="440" y="40" width="460" height="220" rx="14"/><text class="t m" x="670" y="72">🗄️ the record room — a database</text><rect class="soft" x="465" y="95" width="200" height="55" rx="10"/><text class="s m" x="565" y="118">1 durable: written to disk,</text><text class="s m" x="565" y="138">survives the crash</text><rect class="soft" x="690" y="95" width="185" height="55" rx="10"/><text class="s m" x="782" y="118">2 shared: many clerks,</text><text class="s m" x="782" y="138">one truth (locks, txns)</text><rect class="soft" x="560" y="175" width="230" height="55" rx="10"/><text class="s m" x="675" y="198">3 answerable: ask in SQL,</text><text class="s m" x="675" y="218">fast with a catalogue</text><line class="arr" x1="665" y1="122" x2="686" y2="122"/><line class="arr" x1="782" y1="150" x2="700" y2="171"/><g transform="translate(440,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><text class="s m" x="470" y="290">behind every counter (API school) is a record room — this course opens the door 🚪</text><g transform="translate(40,290)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md">Read full lesson 01 →</a></p>
+</section>
+
+<!-- 02 -->
+<section class="dsec" id="l02" style="--c:#b45309">
+  <h2><span class="ln">2</span> 📇 Tables, rows &amp; keys</h2>
+  <p class="d">Registers with numbered lines — primary keys, foreign keys, the class → student → grade shape.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="250" height="110" rx="14"/><text class="t m" x="165" y="70">📇 classes</text><text class="s m" x="165" y="96">id (PK) · name UNIQUE</text><text class="s m" x="165" y="118">1 → 3A · 2 → 3B</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="345" y="40" width="250" height="110" rx="14"/><text class="t m" x="470" y="70">📇 students</text><text class="s m" x="470" y="96">id (PK) · name · roll_no UNIQUE ·</text><text class="s m" x="470" y="118">class_id → classes.id (FK)</text><g transform="translate(345,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="650" y="40" width="260" height="110" rx="14"/><text class="t m" x="780" y="70">📇 grades</text><text class="s m" x="780" y="96">id · student_id (FK) · subject ·</text><text class="s m" x="780" y="118">term · grade — UNIQUE(student, subject, term)</text><g transform="translate(650,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="345" y1="95" x2="290" y2="95"/><line class="arr" x1="650" y1="95" x2="595" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">🔑 keys are the whole trick</text><text class="s m" x="475" y="238">primary key = the line number nobody reuses · foreign key = &#39;see register X, line 3&#39; — the database refuses a line that points nowhere</text><text class="s m" x="475" y="262">one class → many students → many grades: rows in different registers, joined by keys, never copied</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-02-tables-rows-keys/lessons/02-tables-rows-keys/README.md">Read full lesson 02 →</a></p>
+</section>
+
+<!-- 03 -->
+<section class="dsec" id="l03" style="--c:#b45309">
+  <h2><span class="ln">3</span> 🔍 SQL reads</h2>
+  <p class="d">Asking the archivist — SELECT, WHERE, ORDER BY, LIMIT, and JOIN across registers.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">🔍 SELECT name, roll_no</text><text class="s m" x="175" y="96">FROM students WHERE class_id = 1</text><text class="s m" x="175" y="118">ORDER BY name LIMIT 2</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">🔗 JOIN — three registers</text><text class="s m" x="495" y="96">grades ⋈ students ⋈ classes</text><text class="s m" x="495" y="118">ON the keys → one wide answer</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">Σ GROUP BY</text><text class="s m" x="795" y="96">one row per class:</text><text class="s m" x="795" y="118">COUNT, AVG, MAX</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="310" y1="95" x2="356" y2="95"/><line class="arr" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">🧑‍💼 you say WHAT, the archivist decides HOW</text><text class="s m" x="475" y="238">SQL is declarative: filter (WHERE) → group (GROUP BY) → order (ORDER BY) → page (LIMIT/OFFSET) — the planner picks the route (lesson 06)</text><text class="s m" x="475" y="262">python3 db/demo.py reads join — every query in this lesson, live on school.db</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-03-sql-reads/lessons/03-sql-reads/README.md">Read full lesson 03 →</a></p>
+</section>
+
+<!-- 04 -->
+<section class="dsec" id="l04" style="--c:#b45309">
+  <h2><span class="ln">4</span> ✏️ Writes &amp; transactions</h2>
+  <p class="d">The ledger in pencil — INSERT, UPDATE, DELETE, and the eraser (ROLLBACK) that makes ACID real.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">✏️ BEGIN</text><text class="s m" x="175" y="96">UPDATE students SET class_id=2 …</text><text class="s m" x="175" y="118">UPDATE … class_id=99 💥 no such class</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="dead" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">↩️ ROLLBACK</text><text class="s m" x="495" y="96">the eraser: BOTH pencil marks</text><text class="s m" x="495" y="118">vanish — the ledger never lies</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">✅ COMMIT</text><text class="s m" x="795" y="96">ink: all of it, at once,</text><text class="s m" x="795" y="118">and it survives a crash</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr dash" x1="310" y1="95" x2="356" y2="95"/><line class="arr dash" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">🧾 ACID — four promises of the ledger</text><text class="s m" x="475" y="238">Atomic: all or nothing · Consistent: constraints hold after every commit · Isolated: clerks don&#39;t see each other&#39;s pencil (L07) · Durable: ink survives the power cut</text><text class="s m" x="475" y="262">in code: with conn: … — an exception inside = ROLLBACK, the end = COMMIT</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-04-transactions/lessons/04-transactions/README.md">Read full lesson 04 →</a></p>
+</section>
+
+<!-- 05 -->
+<section class="dsec" id="l05" style="--c:#b45309">
+  <h2><span class="ln">5</span> 🧩 Data modelling</h2>
+  <p class="d">One fact, one place — normalisation, constraints, and when to break the rule on purpose.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="dead" x="40" y="40" width="420" height="110" rx="14"/><text class="t m" x="250" y="70">❌ one big register</text><text class="s m" x="250" y="96">student · class · teacher · teacher&#39;s phone · grade …</text><text class="s m" x="250" y="118">the teacher changes phone → 30 rows to fix, 29 forgotten</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="490" y="40" width="420" height="110" rx="14"/><text class="t m" x="700" y="70">✅ one fact, one place (normalised)</text><text class="s m" x="700" y="96">classes · students · grades · teachers — each fact once,</text><text class="s m" x="700" y="118">linked by keys; the schema refuses nonsense (CHECK, UNIQUE, FK)</text><g transform="translate(490,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><line class="arr" x1="460" y1="95" x2="486" y2="95"/><rect class="soft" x="40" y="185" width="420" height="100" rx="12"/><text class="t m" x="250" y="212">🧩 the three questions per table</text><text class="s m" x="250" y="238">what is one row? what identifies it? which facts</text><text class="s m" x="250" y="260">belong to it, not to something it points at?</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><rect class="soft" x="490" y="185" width="420" height="100" rx="12"/><text class="t m" x="700" y="212">⚖️ denormalise on purpose</text><text class="s m" x="700" y="238">copy a value to avoid a hot JOIN — only with a</text><text class="s m" x="700" y="260">measured reason, and a rule for keeping it true</text><g transform="translate(490,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-05-data-modelling/lessons/05-data-modelling/README.md">Read full lesson 05 →</a></p>
+</section>
+
+<!-- 06 -->
+<section class="dsec" id="l06" style="--c:#b45309">
+  <h2><span class="ln">6</span> 🗂️ Indexes</h2>
+  <p class="d">The card catalogue — B-trees, EXPLAIN, and when a catalogue slows you down.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="dead" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">🚶 SCAN attendance</text><text class="s m" x="175" y="96">200,000 lines, read every one</text><text class="s m" x="175" y="118">for student 4242 → 2.4 ms</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">🗂️ CREATE INDEX</text><text class="s m" x="495" y="96">a card catalogue sorted by</text><text class="s m" x="495" y="118">student_id — a B-tree</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">🔍 SEARCH … USING INDEX</text><text class="s m" x="795" y="96">straight to the drawer</text><text class="s m" x="795" y="118">→ 0.0 ms</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="310" y1="95" x2="356" y2="95"/><line class="arr" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">📖 EXPLAIN QUERY PLAN — the archivist tells you the route before walking it</text><text class="s m" x="475" y="238">index what you filter and join on · every index costs writes and space · composite order matters (class, name ≠ name, class) ·</text><text class="s m" x="475" y="262">a catalogue for a 5-row table is slower than reading the 5 rows — measure, don&#39;t guess</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-06-indexes/lessons/06-indexes/README.md">Read full lesson 06 →</a></p>
+</section>
+
+<!-- 07 -->
+<section class="dsec" id="l07" style="--c:#1d4ed8">
+  <h2><span class="ln">7</span> 🔒 Concurrency &amp; isolation</h2>
+  <p class="d">Two clerks, one register — locks, isolation levels, and the deadlock handshake.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">🧑‍💼 clerk 2: BEGIN</text><text class="s m" x="175" y="96">UPDATE students … id=2</text><text class="s m" x="175" y="118">(not committed yet — pencil)</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">🧑‍💼 clerk 1 reads id=2</text><text class="s m" x="495" y="96">sees the OLD name — isolation:</text><text class="s m" x="495" y="118">no peeking at pencil marks</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="dead" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">⏳ clerk 1 writes id=2</text><text class="s m" x="795" y="96">waits for the lock… timeout:</text><text class="s m" x="795" y="118">&#39;database is locked&#39;</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="310" y1="95" x2="356" y2="95"/><line class="arr" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">🎚️ isolation levels = how much pencil you may see</text><text class="s m" x="475" y="238">read committed (default in Postgres) · repeatable read · serializable (as if one clerk at a time) — stricter = safer = more waiting ·</text><text class="s m" x="475" y="262">deadlock = two clerks each holding the register the other needs; the database picks a victim — keep transactions short, lock in one order</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-07-concurrency/lessons/07-concurrency/README.md">Read full lesson 07 →</a></p>
+</section>
+
+<!-- 08 -->
+<section class="dsec" id="l08" style="--c:#1d4ed8">
+  <h2><span class="ln">8</span> 🏗️ Migrations</h2>
+  <p class="d">Renovating the room while school is open — versioned scripts, expand then contract.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">📜 001_init.sql</text><text class="s m" x="175" y="96">the room as first built —</text><text class="s m" x="175" y="118">in git, applied once</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">➕ 002_add_house.sql</text><text class="s m" x="495" y="96">ALTER TABLE … ADD COLUMN</text><text class="s m" x="495" y="118">house DEFAULT &#39;red&#39; — expand</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">🧾 schema_migrations</text><text class="s m" x="795" y="96">the logbook: which scripts</text><text class="s m" x="795" y="118">ran, when — never twice</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="310" y1="95" x2="356" y2="95"/><line class="arr" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">🏗️ expand → migrate → contract (school stays open)</text><text class="s m" x="475" y="238">add the new column/table (old code ignores it) → ship code that writes both → backfill → ship code that reads the new → drop the old ·</text><text class="s m" x="475" y="262">never rename in one step · every migration reversible or rehearsed on a copy · python3 db/migrate.py</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-08-migrations/lessons/08-migrations/README.md">Read full lesson 08 →</a></p>
+</section>
+
+<!-- 09 -->
+<section class="dsec" id="l09" style="--c:#1d4ed8">
+  <h2><span class="ln">9</span> 🧯 Backups &amp; recovery</h2>
+  <p class="d">The fireproof copy — RPO, RTO, point-in-time, and the restore drill you actually run.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">🧯 the fireproof copy</text><text class="s m" x="175" y="96">conn.backup() → school.backup.db</text><text class="s m" x="175" y="118">(nightly full + continuous log)</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="dead" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">💥 the accident</text><text class="s m" x="495" y="96">DELETE FROM students WHERE id=5</text><text class="s m" x="495" y="118">— Rohan is gone</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">♻️ restore + verify</text><text class="s m" x="795" y="96">copy back · SELECT to prove it ·</text><text class="s m" x="795" y="118">Rohan returns</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="310" y1="95" x2="356" y2="95"/><line class="arr" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">⏱️ two numbers the school agrees on BEFORE the fire</text><text class="s m" x="475" y="238">RPO — how much can we lose? (minutes of log, hours of dump) · RTO — how long may the room be shut? (the drill&#39;s stopwatch) ·</text><text class="s m" x="475" y="262">a backup nobody has restored is a rumour · point-in-time = dump + replayed log · keep a copy in another building (AWS L17: RDS snapshots)</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-09-backups-recovery/lessons/09-backups-recovery/README.md">Read full lesson 09 →</a></p>
+</section>
+
+<!-- 10 -->
+<section class="dsec" id="l10" style="--c:#1d4ed8">
+  <h2><span class="ln">10</span> 📈 Scaling</h2>
+  <p class="d">More clerks, more rooms — pools, replicas, caches, partitions, and when not to shard.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="200" height="120" rx="14"/><text class="t m" x="140" y="70">🚰 pool</text><text class="s m" x="140" y="96">reuse connections;</text><text class="s m" x="140" y="118">the first, cheapest win</text><text class="s m" x="140" y="140">(pgbouncer, HikariCP)</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="270" y="40" width="200" height="120" rx="14"/><text class="t m" x="370" y="70">📖 read replicas</text><text class="s m" x="370" y="96">copies of the room for</text><text class="s m" x="370" y="118">readers; a beat behind</text><text class="s m" x="370" y="140">(replication lag!)</text><g transform="translate(270,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="500" y="40" width="200" height="120" rx="14"/><text class="t m" x="600" y="70">🧊 cache</text><text class="s m" x="600" y="96">hot answers kept at the</text><text class="s m" x="600" y="118">counter (Redis) — stale</text><text class="s m" x="600" y="140">on purpose, briefly</text><g transform="translate(500,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><rect class="box" x="730" y="40" width="180" height="120" rx="14"/><text class="t m" x="820" y="70">🏢 partitions / shards</text><text class="s m" x="820" y="96">rooms per year or</text><text class="s m" x="820" y="118">region — last resort:</text><text class="s m" x="820" y="140">JOINs and txns suffer</text><g transform="translate(730,40)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g><rect class="soft" x="40" y="195" width="870" height="90" rx="14"/><text class="t m" x="475" y="222">📈 the order teams actually follow</text><text class="s m" x="475" y="248">fix the queries and indexes (L06/L12) → pool → cache → bigger machine → read replicas → partition → shard — most schools never need the last two</text><text class="s m" x="475" y="270">writes scale hardest: one primary, many replicas · Multi-AZ (AWS L17) is for surviving a fire, not for speed</text>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-10-scaling/lessons/10-scaling/README.md">Read full lesson 10 →</a></p>
+</section>
+
+<!-- 11 -->
+<section class="dsec" id="l11" style="--c:#1d4ed8">
+  <h2><span class="ln">11</span> 🏘️ NoSQL &amp; other rooms</h2>
+  <p class="d">Document, key-value, columnar, graph, vector — choosing the room for the question.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="box" x="40" y="40" width="200" height="120" rx="14"/><text class="t m" x="140" y="70">📄 document</text><text class="s m" x="140" y="96">MongoDB · JSON per row,</text><text class="s m" x="140" y="118">flexible shape — nested</text><text class="s m" x="140" y="140">records, few JOINs</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="270" y="40" width="200" height="120" rx="14"/><text class="t m" x="370" y="70">🔑 key-value</text><text class="s m" x="370" y="96">Redis · DynamoDB — one key,</text><text class="s m" x="370" y="118">one answer, microseconds;</text><text class="s m" x="370" y="140">caches, sessions, counters</text><g transform="translate(270,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="500" y="40" width="200" height="120" rx="14"/><text class="t m" x="600" y="70">📊 columnar</text><text class="s m" x="600" y="96">BigQuery · ClickHouse —</text><text class="s m" x="600" y="118">sum a billion rows;</text><text class="s m" x="600" y="140">analytics, not per-row edits</text><g transform="translate(500,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><rect class="box" x="730" y="40" width="180" height="120" rx="14"/><text class="t m" x="820" y="70">🕸️ graph · 🗺️ vector</text><text class="s m" x="820" y="96">who-knows-whom hops ·</text><text class="s m" x="820" y="118">nearest-by-meaning</text><text class="s m" x="820" y="140">(VectorDB school)</text><g transform="translate(730,40)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g><rect class="soft" x="40" y="195" width="870" height="90" rx="14"/><text class="t m" x="475" y="222">🧭 the room follows the question</text><text class="s m" x="475" y="248">relational (Postgres, MySQL, SQLite) is the default room: constraints, JOINs, transactions — pick another only for a question it answers badly</text><text class="s m" x="475" y="270">many schools run Postgres + Redis + one analytics room; &#39;NoSQL because scale&#39; without a measured reason is the classic regret</text>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-11-nosql-other-rooms/lessons/11-nosql-other-rooms/README.md">Read full lesson 11 →</a></p>
+</section>
+
+<!-- 12 -->
+<section class="dsec" id="l12" style="--c:#1d4ed8">
+  <h2><span class="ln">12</span> 🩺 Performance &amp; operations</h2>
+  <p class="d">Slow-query triage, N+1, observability — the checklist before the record room goes on call.</p>
+  <svg viewBox="0 0 940 305" role="img"><rect class="dead" x="40" y="40" width="270" height="110" rx="14"/><text class="t m" x="175" y="70">🐢 N+1</text><text class="s m" x="175" y="96">1 query for students + 1 per</text><text class="s m" x="175" y="118">student for grades — 6 trips</text><g transform="translate(40,40)"><circle r="11" class="nc"/><text class="nt" dy="4">1</text></g><rect class="box" x="360" y="40" width="270" height="110" rx="14"/><text class="t m" x="495" y="70">🐇 one JOIN</text><text class="s m" x="495" y="96">LEFT JOIN grades … GROUP BY</text><text class="s m" x="495" y="118">— 1 trip, same answer</text><g transform="translate(360,40)"><circle r="11" class="nc"/><text class="nt" dy="4">2</text></g><rect class="box" x="680" y="40" width="230" height="110" rx="14"/><text class="t m" x="795" y="70">🩺 the slow-query log</text><text class="s m" x="795" y="96">every query over N ms, with</text><text class="s m" x="795" y="118">its plan — read it weekly</text><g transform="translate(680,40)"><circle r="11" class="nc"/><text class="nt" dy="4">3</text></g><line class="arr" x1="310" y1="95" x2="356" y2="95"/><line class="arr" x1="630" y1="95" x2="676" y2="95"/><rect class="soft" x="40" y="185" width="870" height="100" rx="14"/><text class="t m" x="475" y="212">📋 the on-call checklist for the record room</text><text class="s m" x="475" y="238">connections near the limit? · replication lag? · disk + WAL growth? · lock waits + deadlocks? · slowest 10 queries this week? · last restore drill date? ·</text><text class="s m" x="475" y="262">dashboards: QPS, p95 latency, errors, cache hit rate — the Kubernetes school&#39;s Grafana habit, pointed at the database</text><g transform="translate(40,185)"><circle r="11" class="nc"/><text class="nt" dy="4">4</text></g>
+  </svg>
+  <p class="foot"><a href="https://github.com/BaluRaut/learn-database-school/blob/lesson-12-performance-ops/lessons/12-performance-ops/README.md">Read full lesson 12 →</a></p>
+</section>
+
+  <a class="btn" href="https://github.com/BaluRaut/learn-database-school/blob/lesson-01-why-databases/lessons/01-why-databases/README.md">Start Lesson 01 →</a>
+  <a class="btn alt" href="study-plan.html">🗓️ Study plan (4 weeks)</a>
+  <a class="btn alt" href="lesson-diagrams.html">📐 All 12 lesson diagrams</a>
+  <a class="btn alt" href="quiz.html">🧪 Quiz (15 Qs)</a>
+  <a class="btn alt" href="before-and-tradeoffs.html">⏮️ Before &amp; trade-offs</a>
+  
+<footer>
+  Learn Database School · the record room is in the repo · <a href="index.html">Course home</a> · <a href="lesson-diagrams.html">Lesson diagrams</a> · <a href="https://github.com/BaluRaut/learn-database-school">GitHub</a> · <a href="https://baluraut.github.io/school/dictionary.html">📖 the Dictionary</a> · <a href="https://baluraut.github.io/school/">🏫 all schools</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 found a mistake?</a>
+</footer>
+</div>
+</body>
+</html>

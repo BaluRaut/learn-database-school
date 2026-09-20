@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz — Learn Database School</title>
+<meta name="description" content="Self-test quiz for Learn Database School — 15 questions with explanations.">
+<meta property="og:title" content="Quiz — Learn Database School">
+<meta property="og:description" content="Self-test quiz for Learn Database School — 15 questions with explanations.">
+<meta property="og:image" content="https://baluraut.github.io/learn-database-school/images/big-picture-4k.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#b45309; --ok:#16a34a; --blue:#2563eb; --bad:#dc2626; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0b1220; --card:#131c2e; --ink:#e2e8f0; --muted:#94a3b8; --line:#253349; } }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.6; }
+  .wrap { max-width:1280px; margin:0 auto; padding:28px 20px 60px; }
+  @media (min-width: 1660px) { .wrap { max-width: 1580px; } }
+  a { color:var(--blue); } h1 { font-size:2rem; line-height:1.25; } h2 { font-size:1.4rem; margin:44px 0 6px; }
+  .sub { color:var(--muted); max-width:74ch; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 8px; }
+  .chip { border:1px solid var(--line); background:var(--card); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-top:16px; }
+  .lesson { background:var(--card); border:1px solid var(--line); border-top:5px solid var(--c,var(--accent)); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .lesson .top { display:flex; align-items:center; gap:10px; }
+  .lesson .num { flex:none; width:30px; height:30px; border-radius:50%; background:var(--c,var(--accent)); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; }
+  .lesson h3 { font-size:1.02rem; line-height:1.3; } .lesson .ana { color:var(--muted); font-size:.9rem; }
+  .lesson code { font-size:.78rem; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:1px 6px; }
+  .lesson a.go { margin-top:auto; font-weight:600; font-size:.9rem; text-decoration:none; } .lesson a.go+a.go { margin-top:0; } .lesson a.go:hover { text-decoration:underline; }
+  .callout { background:var(--card); border:1px solid var(--line); border-left:6px solid var(--ok); border-radius:14px; padding:18px 20px; margin-top:16px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; overflow-x:auto; font-size:.88rem; margin-top:12px; }
+  .btn { display:inline-block; background:var(--accent); color:#fff; border-radius:10px; padding:10px 18px; text-decoration:none; font-weight:700; margin:14px 10px 0 0; }
+  .btn.alt { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .vs { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:16px; }
+  .vcol { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; } .vcol h3 { margin-bottom:8px; }
+  .vcol ul { margin-left:18px; color:var(--muted); font-size:.93rem; }
+  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:12px} .tbl table{border-collapse:collapse;width:100%;font-size:.9rem} .tbl th,.tbl td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} .tbl th{background:var(--bg)}
+  footer { margin-top:56px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:.88rem; }
+
+.wrap { max-width:900px; margin:0 auto; padding:28px 20px 60px; }
+.scorebox { position:sticky; top:0; background:var(--bg); padding:10px 0; z-index:5; }
+.score { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:10px 16px; font-weight:700; }
+.qcard { background:var(--card); border:1px solid var(--line); border-left:6px solid var(--accent); border-radius:14px; padding:18px 20px; margin-top:16px; }
+.qcard h3 { font-size:1.02rem; margin-bottom:10px; }
+.opt { display:block; width:100%; text-align:left; margin-top:8px; padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font:inherit; cursor:pointer; }
+.opt:hover { border-color:var(--accent); }
+.opt.right { border-color:var(--ok); background:color-mix(in srgb, var(--ok) 12%, var(--bg)); }
+.opt.wrong { border-color:var(--bad); background:color-mix(in srgb, var(--bad) 12%, var(--bg)); }
+.why { display:none; margin-top:10px; color:var(--muted); font-size:.92rem; border-top:1px dashed var(--line); padding-top:8px; }
+.reset { margin-top:20px; background:var(--accent); color:#fff; border:none; border-radius:10px; padding:10px 18px; font:inherit; font-weight:700; cursor:pointer; }
+.parts{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px} .pbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:.88rem;cursor:pointer} .pbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<p><a href="index.html">← Back to the course home</a></p>
+<h1>🧪 The 🗄️ Database quiz</h1>
+<p class="sub">15 questions — pick an answer, get the why. Filter by Part below. One attempt per question (until reset). Your best score is saved in this browser.</p>
+<div class="scorebox"><div class="score" id="score">0 / 15 · best: —</div></div>
+<div class="parts" id="parts"><button class="pbtn on" onclick="setPart(0)">All 15</button><button class="pbtn" onclick="setPart(1)">📇 Part 1 record room</button><button class="pbtn" onclick="setPart(2)">🏃 Part 2 running it</button></div>
+<div id="quiz"></div>
+<button class="reset" onclick="reset()">↺ Reset &amp; retake</button>
+<footer>Part of <a href="https://baluraut.github.io/school/">🏫 The School</a> · <a href="index.html">course home</a> · <a href="https://github.com/BaluRaut/learn-database-school/issues">🐛 found a mistake?</a></footer>
+</div>
+<script>
+var QS = [{"q": "Why a database instead of a file per app?", "o": ["Files are slower to open", "Durable, shared by many clerks safely, and answerable by question (SQL) — files give you none of the three", "Databases are free"], "c": 1, "w": "L01: the record room vs sticky notes.", "p": 1}, {"q": "A foreign key is…", "o": ["A password", "'See register X, line 3' — a reference the database refuses to let point nowhere", "An index"], "c": 1, "w": "L02: keys are the whole trick.", "p": 1}, {"q": "Which clause runs first: WHERE or ORDER BY?", "o": ["ORDER BY", "WHERE — filter, then group, then order, then page", "They run together"], "c": 1, "w": "L03: you say what, the archivist decides how.", "p": 1}, {"q": "Inside one transaction the second UPDATE fails. Disk afterwards?", "o": ["The first update is saved", "Neither — the whole transaction rolled back (atomic)", "Both, with a warning"], "c": 1, "w": "L04: the eraser.", "p": 1}, {"q": "'One fact, one place' protects against…", "o": ["Slow queries", "Updates that disagree — the teacher's phone fixed in 29 of 30 rows", "Deadlocks"], "c": 1, "w": "L05: normalisation.", "p": 1}, {"q": "When does an index make things slower?", "o": ["Never", "On writes to that table, and on tiny tables where a scan beats the catalogue", "Only on reads"], "c": 1, "w": "L06: every index costs writes; measure with EXPLAIN.", "p": 1}, {"q": "EXPLAIN QUERY PLAN shows SCAN on a big table. Meaning?", "o": ["The query is fine", "It reads every row — an index on the filtered column would make it a SEARCH", "The table is corrupt"], "c": 1, "w": "L06.", "p": 1}, {"q": "Clerk 2 has an uncommitted UPDATE on row 2. Clerk 1 reads row 2 and sees…", "o": ["The new value", "The old committed value — isolation hides pencil marks", "An error"], "c": 1, "w": "L07.", "p": 2}, {"q": "A deadlock is…", "o": ["A slow query", "Two transactions each waiting for a lock the other holds — the database kills one; keep transactions short, lock in one order", "A full disk"], "c": 1, "w": "L07.", "p": 2}, {"q": "Rename a column with zero downtime — the shape?", "o": ["ALTER TABLE RENAME on Friday night", "Expand (add new column) → write both → backfill → read new → contract (drop old)", "Copy the table"], "c": 1, "w": "L08: expand/contract.", "p": 2}, {"q": "RPO and RTO?", "o": ["Two backup file formats", "How much data you may lose vs how long you may be down — agreed before the fire, proven by a restore drill", "Replica settings"], "c": 1, "w": "L09: a backup nobody restored is a rumour.", "p": 2}, {"q": "First step when the database is 'slow'?", "o": ["Shard it", "Find the slow queries and missing indexes; then pool, cache, bigger box, replicas — shard last", "Buy more RAM"], "c": 1, "w": "L10/L12: the order teams actually follow.", "p": 2}, {"q": "Reading your own write from a read replica may…", "o": ["Be faster", "Show the past — replication lag; read your own writes from the primary", "Lock the primary"], "c": 1, "w": "L10.", "p": 2}, {"q": "Which room for 'sum sales over a billion rows'?", "o": ["Key-value", "Columnar (analytics) — relational is the default room for everything with rules and relationships", "Graph"], "c": 1, "w": "L11: the room follows the question.", "p": 2}, {"q": "N+1 means…", "o": ["One more index than needed", "One query for the list plus one per row — replace with a JOIN (or a batched IN)", "A migration number"], "c": 1, "w": "L12.", "p": 2}];
+var KEY='quiz-learn-database-school', answered={}, score=0, PART=0, SEL=QS;
+function setPart(p){PART=p;SEL=p?QS.filter(function(q){return q.p===p}):QS;[].slice.call(document.querySelectorAll('.pbtn')).forEach(function(b,i){b.classList.toggle('on',i===p)});reset();}
+var best = parseInt(localStorage.getItem(KEY)||'-1');
+function render() {
+  var el = document.getElementById('quiz'); el.innerHTML='';
+  SEL.forEach(function(q,i) {
+    var card=document.createElement('div'); card.className='qcard';
+    card.innerHTML='<h3>'+(i+1)+'. '+q.q+'</h3>';
+    q.o.forEach(function(opt,j) {
+      var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+      b.onclick=function() {
+        if (answered[i]!==undefined) return;
+        answered[i]=j;
+        if (j===q.c) { b.classList.add('right'); score++; }
+        else { b.classList.add('wrong'); card.querySelectorAll('.opt')[q.c].classList.add('right'); }
+        card.querySelector('.why').style.display='block';
+        update();
+      };
+      card.appendChild(b);
+    });
+    var why=document.createElement('div'); why.className='why'; why.textContent='💡 '+q.w;
+    card.appendChild(why);
+    el.appendChild(card);
+  });
+}
+function update() {
+  var done=Object.keys(answered).length;
+  if (PART===0 && done===QS.length && score>best) { best=score; localStorage.setItem(KEY,best); }
+  document.getElementById('score').textContent=score+' / '+SEL.length+(done===SEL.length?' — done! 🎓':'')+' · best (all 15): '+(best<0?'—':best+'/'+QS.length);
+}
+function reset() { answered={}; score=0; render(); update(); }
+render(); update();
+</script>
+</body>
+</html>

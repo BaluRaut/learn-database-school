@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1160" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker></defs>
+  <style>
+    .band1 { fill: #fff; stroke: #b45309; stroke-width: 3; } .band2 { fill: #fff; stroke: #1d4ed8; stroke-width: 3; }
+    .bxp { fill: #fff; stroke: #b45309; stroke-width: 2.5; } .bxo { fill: #fff; stroke: #1d4ed8; stroke-width: 2.5; }
+    .warn { fill: #fef2f2; stroke: #dc2626; stroke-width: 1.5; stroke-dasharray: 7 6; } .tip { fill: #fffbeb; stroke: #b45309; stroke-width: 1.5; } .win { fill: #eff6ff; stroke: #1d4ed8; stroke-width: 1.5; }
+    .title { font-size: 36px; font-weight: 800; fill: #0f172a; } .bandt { font-size: 26px; font-weight: 800; }
+    .t { font-size: 19px; font-weight: 600; fill: #0f172a; } .s { font-size: 15px; fill: #475569; } .m { text-anchor: middle; }
+    .ntb { font-size: 15px; font-weight: 700; fill: #fff; text-anchor: middle; }
+  </style>
+  <rect x="0" y="0" width="1920" height="1160" fill="#ffffff"/>
+  <text class="title m" x="960" y="52">The Big Picture — databases: the record room · the room is in the repo</text>
+
+  <rect class="band1" x="40" y="80" width="1840" height="470" rx="20"/>
+  <text class="bandt" x="70" y="122" fill="#b45309">📇 PART 1 — THE RECORD ROOM (lessons 1–6)</text>
+
+  <rect class="bxp" x="70" y="170" width="330" height="130" rx="14"/>
+  <text class="t m" x="235" y="203">🗄️ why a record room</text>
+  <text class="s m" x="235" y="231">durable (survives the crash) · shared</text>
+  <text class="s m" x="235" y="255">(many clerks, one truth) · answerable</text>
+  <text class="s m" x="235" y="279">(ask in SQL) — sticky notes do none</text>
+  <g transform="translate(70,170)"><circle r="13" fill="#b45309"/><text class="ntb" dy="5">1</text></g>
+
+  <rect class="bxp" x="460" y="170" width="400" height="130" rx="14"/>
+  <text class="t m" x="660" y="203">📇 registers, line numbers, keys</text>
+  <text class="s m" x="660" y="231">classes → students → grades · primary key =</text>
+  <text class="s m" x="660" y="255">the line nobody reuses · foreign key = 'see</text>
+  <text class="s m" x="660" y="279">register X, line 3' — and it cannot point nowhere</text>
+  <g transform="translate(460,170)"><circle r="13" fill="#b45309"/><text class="ntb" dy="5">2</text></g>
+
+  <rect class="bxp" x="920" y="170" width="400" height="130" rx="14"/>
+  <text class="t m" x="1120" y="203">🔍✏️ asking and writing — SQL</text>
+  <text class="s m" x="1120" y="231">SELECT · WHERE · ORDER BY · LIMIT · JOIN ·</text>
+  <text class="s m" x="1120" y="255">GROUP BY — you say what, the archivist how ·</text>
+  <text class="s m" x="1120" y="279">BEGIN … COMMIT, or ROLLBACK: the eraser (ACID)</text>
+  <g transform="translate(920,170)"><circle r="13" fill="#b45309"/><text class="ntb" dy="5">3</text></g>
+
+  <rect class="bxp" x="1380" y="170" width="470" height="130" rx="14"/>
+  <text class="t m" x="1615" y="203">🧩🗂️ one fact one place · the catalogue</text>
+  <text class="s m" x="1615" y="231">normalise: the teacher's phone lives in ONE row ·</text>
+  <text class="s m" x="1615" y="255">CHECK, UNIQUE, FK refuse nonsense · an index turns</text>
+  <text class="s m" x="1615" y="279">SCAN into SEARCH — EXPLAIN shows the route</text>
+  <g transform="translate(1380,170)"><circle r="13" fill="#b45309"/><text class="ntb" dy="5">4</text></g>
+
+  <rect class="tip" x="70" y="400" width="880" height="110" rx="14"/>
+  <text class="t m" x="510" y="438">🔬 db/demo.py + db/migrate.py — Python's built-in SQLite, zero dependencies</text>
+  <text class="s m" x="510" y="466">schema.sql · seed.sql · reads · join · a rollback · an index race on 200,000 rows · a lock · a restore · N+1</text>
+  <text class="s m" x="510" y="490">the same ideas in Postgres and MySQL — the lessons say where they differ</text>
+
+  <rect class="warn" x="990" y="400" width="860" height="110" rx="14"/>
+  <text class="t m" x="1420" y="438">⚠️ the two mistakes every first schema makes</text>
+  <text class="s m" x="1420" y="466">one big register with everything copied into it — and no constraints, so bad rows are merely unlikely</text>
+  <text class="s m" x="1420" y="490">one fact, one place; let the schema refuse nonsense; index what you filter and join on</text>
+
+  <text class="t m" x="960" y="590">python3 db/demo.py — every lesson's queries, live, in 60 seconds</text>
+
+  <rect class="band2" x="40" y="620" width="1840" height="500" rx="20"/>
+  <text class="bandt" x="70" y="662" fill="#1d4ed8">🏃 PART 2 — RUNNING THE RECORD ROOM (lessons 7–12)</text>
+
+  <rect class="bxo" x="70" y="700" width="420" height="200" rx="14"/>
+  <text class="t m" x="280" y="733">🔒🏗️ two clerks · renovations (7–8)</text>
+  <text class="s m" x="280" y="761">isolation hides pencil marks · locks make</text>
+  <text class="s m" x="280" y="785">the second writer wait · deadlock = the</text>
+  <text class="s m" x="280" y="809">handshake, one victim · short transactions</text>
+  <text class="s m" x="280" y="845">migrations in git, applied once, logged ·</text>
+  <text class="s m" x="280" y="869">expand → migrate → contract, school stays open</text>
+  <g transform="translate(70,700)"><circle r="13" fill="#1d4ed8"/><text class="ntb" dy="5">1</text></g>
+
+  <rect class="bxo" x="540" y="700" width="420" height="200" rx="14"/>
+  <text class="t m" x="750" y="733">🧯📈 the fireproof copy · more clerks (9–10)</text>
+  <text class="s m" x="750" y="761">RPO (how much may we lose) · RTO (how long</text>
+  <text class="s m" x="750" y="785">may we be shut) · a backup nobody restored is</text>
+  <text class="s m" x="750" y="809">a rumour · the scaling ladder: queries + indexes</text>
+  <text class="s m" x="750" y="833">→ pool → cache → bigger box → read replicas</text>
+  <text class="s m" x="750" y="857">(lag!) → partitions → shard, last</text>
+  <g transform="translate(540,700)"><circle r="13" fill="#1d4ed8"/><text class="ntb" dy="5">2</text></g>
+
+  <rect class="bxo" x="1010" y="700" width="400" height="200" rx="14"/>
+  <text class="t m" x="1210" y="733">🏘️ other rooms (11)</text>
+  <text class="s m" x="1210" y="761">document · key-value · columnar ·</text>
+  <text class="s m" x="1210" y="785">graph · vector (the VectorDB school) ·</text>
+  <text class="s m" x="1210" y="809">relational is the default room —</text>
+  <text class="s m" x="1210" y="833">pick another only for a question</text>
+  <text class="s m" x="1210" y="857">it answers badly; measure first</text>
+  <g transform="translate(1010,700)"><circle r="13" fill="#1d4ed8"/><text class="ntb" dy="5">3</text></g>
+
+  <rect class="bxo" x="1460" y="700" width="390" height="200" rx="14"/>
+  <text class="t m" x="1655" y="733">🩺 on call (12)</text>
+  <text class="s m" x="1655" y="761">N+1 → one JOIN · the slow-query log,</text>
+  <text class="s m" x="1655" y="785">read weekly · connections, lag, disk,</text>
+  <text class="s m" x="1655" y="809">lock waits, slowest 10, last restore</text>
+  <text class="s m" x="1655" y="833">drill · dashboards: QPS, p95, errors,</text>
+  <text class="s m" x="1655" y="857">cache hit rate</text>
+  <g transform="translate(1460,700)"><circle r="13" fill="#1d4ed8"/><text class="ntb" dy="5">4</text></g>
+
+  <rect class="win" x="70" y="950" width="1780" height="140" rx="14"/>
+  <text class="t m" x="960" y="990">🧭 read one record room, read them all: registers + keys · ask in SQL · write in pencil, commit in ink · one fact one place · a catalogue for hot questions</text>
+  <text class="s m" x="960" y="1020">clerks wait for locks · renovate while open · rehearse the restore · scale in order · other rooms for other questions · watch the slow-query log</text>
+  <text class="s m" x="960" y="1050">siblings: the API school puts the counter in front of this room · the VectorDB school is the meaning hall next door · AWS L17 rents the room (RDS)</text>
+</svg>

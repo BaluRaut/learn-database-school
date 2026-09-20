@@ -1,0 +1,67 @@
+🗄️  school.db built from schema.sql + seed.sql
+
+═══ reads ═══
+── SELECT … WHERE … ORDER BY … LIMIT
+    ('Aarav', '3A-01')
+    ('Kabir', '3A-03')
+
+═══ join ═══
+── JOIN — cross-referencing three registers
+    ('Aarav', '3A', 'maths', 'A')
+    ('Meera', '3B', 'maths', 'A')
+    ('Sita', '3A', 'maths', 'A+')
+    ('Rohan', '3B', 'maths', 'B')
+    ('Kabir', '3A', 'maths', 'B+')
+
+── GROUP BY — one row per class
+    ('3A', 3)
+    ('3B', 2)
+
+═══ txn ═══
+── before the transfer
+    ('Aarav', 1)
+    ('Meera', 2)
+
+   💥 second update failed: FOREIGN KEY constraint failed → ROLLBACK
+
+── after — the pencil was erased, BOTH changes gone
+    ('Aarav', 1)
+    ('Meera', 2)
+
+═══ model ═══
+── one fact, one place — the class name lives in ONE row
+    (1, '3A')
+    (2, '3B')
+
+   💥 duplicate roll_no refused by the schema: UNIQUE constraint failed: students.roll_no 
+
+   💥 impossible grade refused by CHECK: CHECK constraint failed: grade IN ('A+','A','B+','B','C') 
+
+═══ index ═══
+── without an index: SCAN attendance → 48 rows in 2.4 ms
+── with the card catalogue: SEARCH attendance USING COVERING INDEX idx_attendance_student (student_id=?) → 48 rows in 0.0 ms
+
+═══ locks ═══
+── clerk 1 reads while clerk 2's change is uncommitted (isolation)
+    (2, 'Sita')
+
+   ⏳ clerk 1 waited, then: database is locked — the lock protects the register
+
+═══ backup ═══
+── after the accident — Rohan is gone
+    (1, 'Aarav')
+    (2, 'Sita')
+    (3, 'Kabir')
+    (4, 'Meera')
+
+── after the restore — from the copy we tested
+    (1, 'Aarav')
+    (2, 'Sita')
+    (3, 'Kabir')
+    (4, 'Meera')
+    (5, 'Rohan')
+
+═══ nplus1 ═══
+── N+1: 6 queries, 0.10 ms · one JOIN: 1 query, 0.04 ms — same answer [('Aarav', 2), ('Sita', 2)]…
+
+✅ done — the record room survived every lesson
