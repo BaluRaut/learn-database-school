@@ -237,6 +237,23 @@ W.olap=(L)=>{const st=$('.stage',L),msg=$('.msg',L);let etl=false,diary=[],g='B'
  if(a==='etl'){etl=true;st.innerHTML=term([['🌙 02:00 CREATE TABLE attendance_by_month AS SELECT month, COUNT(*), AVG(present) …','#93c5fd'],['12 summary rows written to the warehouse','#86efac']]);msg.innerHTML='the heavy work happens once, at night, off the live room'}
  if(a==='warm'){if(!etl){st.innerHTML=term([['no summary yet — run the nightly ETL first','#fde68a']]);return}st.innerHTML=tbl(['month','rate %'],[['2026-01','49.7'],['2026-02','50.0'],['2026-03','50.5']]);msg.innerHTML='<b>0.08 ms</b> instead of 29.3 ms — the same answer, as of last night (reports are a little stale on purpose)'}
  if(a==='change'){const n=g==='B'?'A':'B';diary.push([9,g,n]);g=n;st.innerHTML=tbl(['grade_id','old','new'],diary);msg.innerHTML='the trigger wrote a line to <b>grade_changes</b> — CDC: the warehouse picks up changes without re-reading everything'}}};
+W.joins=(L)=>{const st=$('.stage',L),msg=$('.msg',L);
+ const S=[[1,'Aarav',1],[2,'Sita',1],[3,'Kabir',1],[4,'Meera',2],[5,'Rohan',2]],C=[[101,1],[102,2],[103,4],[104,9]];
+ const venn=(m)=>{const F='#fdba74',K='#b45309',r=26,cx=60,cy=34,d=18,h=Math.sqrt(r*r-d*d);let o='<svg viewBox="0 0 120 70" style="width:120px;height:70px;flex:none">';
+  if(['left','full','anti'].includes(m))o+=`<circle cx="${cx-d}" cy="${cy}" r="${r}" fill="${F}"/>`;if(['right','full'].includes(m))o+=`<circle cx="${cx+d}" cy="${cy}" r="${r}" fill="${F}"/>`;
+  const lens=f=>`<path d="M${cx} ${cy-h} A${r} ${r} 0 0 1 ${cx} ${cy+h} A${r} ${r} 0 0 1 ${cx} ${cy-h} Z" fill="${f}"/>`;if(m==='inner')o+=lens(F);if(m==='anti')o+=lens('#fff');
+  o+=`<circle cx="${cx-d}" cy="${cy}" r="${r}" fill="none" stroke="${K}" stroke-width="2"/><circle cx="${cx+d}" cy="${cy}" r="${r}" fill="none" stroke="${K}" stroke-width="2"/><text x="${cx-d-8}" y="${cy+4}" font-size="9" text-anchor="middle">pupils</text><text x="${cx+d+8}" y="${cy+4}" font-size="9" text-anchor="middle">cards</text></svg>`;return o};
+ const nul='<span style="color:#dc2626;font-weight:700">NULL</span>';
+ L.onclick=e=>{const b=e.target.closest('button');if(!b)return;const t=$('.jt',L).value;let cols=['name','card'],rows=[],sql,why;
+  const card=id=>C.find(c=>c[1]===id),pupil=sid=>S.find(p=>p[0]===sid);
+  if(t==='inner'){rows=C.filter(c=>pupil(c[1])).map(c=>[pupil(c[1])[1],c[0]]);sql='FROM students s INNER JOIN library_cards l ON l.student_id = s.id';why='only rows that found a partner on <b>both</b> sides — Kabir, Rohan and the visitor\'s card drop out'}
+  if(t==='left'){rows=S.map(p=>[p[1],card(p[0])?card(p[0])[0]:nul]);sql='FROM students s LEFT JOIN library_cards l ON …';why='every row of the <b>left</b> table (pupils) stays; no card → NULL. The everyday join for reports'}
+  if(t==='right'){rows=C.map(c=>[pupil(c[1])?pupil(c[1])[1]:nul,c[0]]);sql='FROM students s RIGHT JOIN library_cards l ON …';why='every row of the <b>right</b> table (cards) stays; the visitor\'s card has no pupil → NULL. Same as a LEFT JOIN with the tables swapped'}
+  if(t==='full'){rows=S.map(p=>[p[1],card(p[0])?card(p[0])[0]:nul]).concat(C.filter(c=>!pupil(c[1])).map(c=>[nul,c[0]]));sql='FROM students s FULL OUTER JOIN library_cards l ON …';why='everything from both sides, NULLs wherever a partner is missing — for reconciling two lists (MySQL has no FULL JOIN: LEFT UNION RIGHT)'}
+  if(t==='anti'){cols=['name'];rows=S.filter(p=>!card(p[0])).map(p=>[p[1]]);sql='FROM students s LEFT JOIN library_cards l ON … WHERE l.card IS NULL';why='"who is missing?" — keep the left rows whose partner is NULL (also written NOT EXISTS)'}
+  if(t==='cross'){cols=['class','subject'];['3A','3B'].forEach(c=>['maths','science'].forEach(sb=>rows.push([c,sb])));sql='FROM classes CROSS JOIN (SELECT DISTINCT subject FROM grades)';why='every combination, no ON: 2 classes × 2 subjects = 4 rows. Forget the ON in a normal join and you get this by accident'}
+  if(t==='self'){cols=['a.name','b.name'];S.forEach(a=>S.forEach(b2=>{if(a[2]===b2[2]&&a[0]<b2[0])rows.push([a[1],b2[1]])}));sql='FROM students a JOIN students b ON a.class_id = b.class_id AND a.id < b.id';why='a table joined to itself with two aliases — pairs in the same class; a.id &lt; b.id stops duplicates and self-pairs'}
+  st.innerHTML='';const wrap=el('div','');wrap.style.cssText='display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap';wrap.innerHTML=(['cross','self'].includes(t)?'':venn(t))+'<div>'+term([[sql,'#93c5fd']])+tbl(cols,rows)+'<div style="font-size:.8rem;color:var(--muted)">'+rows.length+' rows</div></div>';st.appendChild(wrap);msg.innerHTML=why}};
 document.querySelectorAll('.lab[data-w]').forEach(L=>{const f=W[L.dataset.w];if(f)try{f(L)}catch(e){console.error(e)}});
 })();
 </script>

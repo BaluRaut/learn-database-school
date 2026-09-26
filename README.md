@@ -52,7 +52,7 @@ git checkout lesson-02-tables-rows-keys  # ...keep going, one branch at a time
 |---|---|---|---|
 | 01 | `lesson-01-why-databases` | Durable, shared, answerable — vs files and spreadsheets | The record room vs sticky notes 🗄️ |
 | 02 | `lesson-02-tables-rows-keys` | Tables, rows, primary and foreign keys | Registers with line numbers 📇 |
-| 03 | `lesson-03-sql-reads` | SELECT, WHERE, ORDER BY, LIMIT, JOIN, GROUP BY | Asking the archivist 🔍 |
+| 03 | `lesson-03-sql-reads` | SELECT, WHERE, ORDER BY, LIMIT, GROUP BY, every JOIN (inner, left, right, full, anti, cross, self) | Asking the archivist 🔍 |
 | 04 | `lesson-04-transactions` | INSERT/UPDATE/DELETE, BEGIN/COMMIT/ROLLBACK, ACID | The ledger in pencil ✏️ |
 | 05 | `lesson-05-data-modelling` | Normalisation, constraints, deliberate denormalisation | One fact, one place 🧩 |
 | 06 | `lesson-06-indexes` | B-trees, EXPLAIN, when an index hurts | The card catalogue 🗂️ |
@@ -86,7 +86,7 @@ learn-database-school/
 ├── db/
 │   ├── schema.sql            # the registers: classes, students, grades, homework — with keys and constraints
 │   ├── seed.sql              # five students, ten grades
-│   ├── demo.py               # every lesson's queries, live (sections: reads join txn model index locks backup nplus1
+│   ├── demo.py               # every lesson's queries, live (sections: reads join joins txn model index locks backup nplus1
 │   │                         #   inject window wal replica appcode olap)
 │   ├── migrate.py            # applies db/migrations/*.sql once each, logged in schema_migrations
 │   └── migrations/           # 001_init · 002_add_house · 003_index_grades_subject

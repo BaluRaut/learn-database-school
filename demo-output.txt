@@ -17,6 +17,49 @@
     ('3A', 3)
     ('3B', 2)
 
+═══ joins ═══
+── INNER JOIN — only pupils WITH a card (matches on both sides)
+    ('Aarav', 101)
+    ('Sita', 102)
+    ('Meera', 103)
+
+── LEFT JOIN — every pupil; no card → NULL
+    ('Aarav', 101)
+    ('Sita', 102)
+    ('Kabir', None)
+    ('Meera', 103)
+    ('Rohan', None)
+
+── RIGHT JOIN — every card; a card with no pupil → NULL name
+    ('Aarav', 101)
+    ('Sita', 102)
+    ('Meera', 103)
+    (None, 104)
+
+── FULL OUTER JOIN — everyone from both sides
+    ('Aarav', 101)
+    ('Sita', 102)
+    ('Kabir', None)
+    ('Meera', 103)
+    ('Rohan', None)
+    (None, 104)
+
+── anti-join (LEFT JOIN … WHERE card IS NULL) — pupils with NO card
+    ('Kabir',)
+    ('Rohan',)
+
+── CROSS JOIN — every class × every subject (the timetable grid)
+    ('3A', 'maths')
+    ('3A', 'science')
+    ('3B', 'maths')
+    ('3B', 'science')
+
+── self join — two pupils in the same class (study buddies)
+    ('Aarav', 'Sita')
+    ('Aarav', 'Kabir')
+    ('Sita', 'Kabir')
+    ('Meera', 'Rohan')
+
 ═══ txn ═══
 ── before the transfer
     ('Aarav', 1)
@@ -62,7 +105,7 @@
     (5, 'Rohan')
 
 ═══ nplus1 ═══
-── N+1: 6 queries, 0.10 ms · one JOIN: 1 query, 0.04 ms — same answer [('Aarav', 2), ('Sita', 2)]…
+── N+1: 6 queries, 0.11 ms · one JOIN: 1 query, 0.04 ms — same answer [('Aarav', 2), ('Sita', 2)]…
 
 ═══ inject ═══
 ── the glued query the database actually received:
@@ -117,13 +160,13 @@
    synchronous replication waits for the replica's 'got it' before COMMIT returns, so nothing is lost — each commit pays a round trip
 
 ═══ appcode ═══
-── 2,000 inserts: commit per row 470 ms · one transaction 2 ms — every COMMIT is a trip to the disk
+── 2,000 inserts: commit per row 438 ms · one transaction 1 ms — every COMMIT is a trip to the disk
    ⏳ attempt 1: database is locked → retry in 50 ms (backoff)
    ⏳ attempt 2: database is locked → retry in 100 ms (backoff)
    ✅ attempt 3: done
 
 ═══ olap ═══
-── report on the live 200,000-line table: 45.1 ms · on the nightly summary (12 rows): 0.04 ms
+── report on the live 200,000-line table: 31.6 ms · on the nightly summary (12 rows): 0.06 ms
    same answer: True → [('2026-01', 49.7), ('2026-02', 50.0), ('2026-03', 50.5)]
 ── CDC: a trigger records every grade change for the warehouse to pick up
     (9, 'B', 'A')

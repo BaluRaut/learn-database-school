@@ -2,7 +2,7 @@
 
 Zero dependencies: Python's built-in sqlite3. Run a section or all of them:
     python3 db/demo.py              # everything, in lesson order
-    python3 db/demo.py join         # sections: reads join txn model index locks backup nplus1
+    python3 db/demo.py join         # sections: reads join joins txn model index locks backup nplus1
                                     #           inject window wal replica appcode olap   (lessons 13–18)
 """
 import os, sqlite3, sys, time, random, shutil
@@ -41,6 +41,27 @@ def join(c):                                              # lesson 03
         WHERE g.subject = 'maths' ORDER BY g.grade, s.name""").fetchall())
     show("GROUP BY — one row per class", c.execute("""
         SELECT c.name, COUNT(*) AS students FROM students s JOIN classes c ON c.id = s.class_id GROUP BY c.name""").fetchall())
+
+def joins(c):                                             # lesson 03 — the JOIN family
+    c.execute("DROP TABLE IF EXISTS library_cards")
+    c.execute("CREATE TABLE library_cards (card INTEGER PRIMARY KEY, student_id INTEGER)")   # no FK: a visitor has a card too
+    c.executemany("INSERT INTO library_cards VALUES (?, ?)", [(101, 1), (102, 2), (103, 4), (104, 9)])   # Aarav, Sita, Meera, a visitor
+    on = "FROM students s {} library_cards l ON l.student_id = s.id"
+    show("INNER JOIN — only pupils WITH a card (matches on both sides)", c.execute(
+        "SELECT s.name, l.card " + on.format("INNER JOIN") + " ORDER BY l.card").fetchall())
+    show("LEFT JOIN — every pupil; no card → NULL", c.execute(
+        "SELECT s.name, l.card " + on.format("LEFT JOIN") + " ORDER BY s.id").fetchall())
+    show("RIGHT JOIN — every card; a card with no pupil → NULL name", c.execute(
+        "SELECT s.name, l.card " + on.format("RIGHT JOIN") + " ORDER BY l.card").fetchall())
+    show("FULL OUTER JOIN — everyone from both sides", c.execute(
+        "SELECT s.name, l.card " + on.format("FULL OUTER JOIN") + " ORDER BY s.id IS NULL, s.id").fetchall())
+    show("anti-join (LEFT JOIN … WHERE card IS NULL) — pupils with NO card", c.execute(
+        "SELECT s.name " + on.format("LEFT JOIN") + " WHERE l.card IS NULL ORDER BY s.id").fetchall())
+    show("CROSS JOIN — every class × every subject (the timetable grid)", c.execute(
+        "SELECT c.name, sub.subject FROM classes c CROSS JOIN (SELECT DISTINCT subject FROM grades) sub ORDER BY c.name, sub.subject").fetchall())
+    show("self join — two pupils in the same class (study buddies)", c.execute("""
+        SELECT a.name, b.name FROM students a JOIN students b ON a.class_id = b.class_id AND a.id < b.id ORDER BY a.id, b.id""").fetchall())
+    c.execute("DROP TABLE library_cards"); c.commit()
 
 def txn(c):                                               # lesson 04
     before = c.execute("SELECT name, class_id FROM students WHERE id IN (1, 4) ORDER BY id").fetchall()
@@ -228,7 +249,7 @@ def olap(c):                                              # lesson 18
     c.execute("UPDATE grades SET grade = 'A' WHERE student_id = 5 AND subject = 'maths'"); c.commit()
     show("CDC: a trigger records every grade change for the warehouse to pick up", c.execute("SELECT grade_id, old, new FROM grade_changes").fetchall())
 
-SECTIONS = dict(reads=reads, join=join, txn=txn, model=model, index=index, locks=locks, backup=backup, nplus1=nplus1,
+SECTIONS = dict(reads=reads, join=join, joins=joins, txn=txn, model=model, index=index, locks=locks, backup=backup, nplus1=nplus1,
                 inject=inject, window=window, wal=wal, replica=replica, appcode=appcode, olap=olap)
 
 if __name__ == "__main__":
