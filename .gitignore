@@ -3,3 +3,5 @@ __pycache__/
 .DS_Store
 db/school.db
 db/school.backup.db
+db/school.db-wal
+db/school.db-shm
