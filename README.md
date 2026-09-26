@@ -73,7 +73,7 @@ git checkout lesson-02-tables-rows-keys  # ...keep going, one branch at a time
 | # | Branch | You learn | Analogy |
 |---|---|---|---|
 | 13 | `lesson-13-security` | SQL injection, parameters, least privilege, encryption | The locked register 🛡️ |
-| 14 | `lesson-14-advanced-sql` | Subqueries, CTEs, window functions, views | Rankings without losing a row 🏆 |
+| 14 | `lesson-14-advanced-sql` | Subqueries, CTEs, window functions, views, functions and stored procedures | Rankings without losing a row 🏆 |
 | 15 | `lesson-15-inside-the-engine` | Write-ahead log, crash recovery, MVCC, vacuum | The archivist's diary 📼 |
 | 16 | `lesson-16-replication-failover` | Streaming replication, lag, sync vs async, failover, CAP | Copies of the room 📡 |
 | 17 | `lesson-17-app-code` | Pools, transactions, batching, retries with backoff, ORMs | The helper with a box 🧑‍💻 |
@@ -87,7 +87,8 @@ learn-database-school/
 │   ├── schema.sql            # the registers: classes, students, grades, homework — with keys and constraints
 │   ├── seed.sql              # five students, ten grades
 │   ├── demo.py               # every lesson's queries, live (sections: reads join joins txn model index locks backup nplus1
-│   │                         #   inject window wal replica appcode olap)
+│   │                         #   inject window procs wal replica appcode olap)
+│   ├── postgres/procedures.sql  # lesson 14: a real PL/pgSQL function + stored procedure (Postgres syntax)
 │   ├── migrate.py            # applies db/migrations/*.sql once each, logged in schema_migrations
 │   └── migrations/           # 001_init · 002_add_house · 003_index_grades_subject
 └── docs/                     # the GitHub Pages site

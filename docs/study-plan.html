@@ -254,6 +254,16 @@ W.joins=(L)=>{const st=$('.stage',L),msg=$('.msg',L);
   if(t==='cross'){cols=['class','subject'];['3A','3B'].forEach(c=>['maths','science'].forEach(sb=>rows.push([c,sb])));sql='FROM classes CROSS JOIN (SELECT DISTINCT subject FROM grades)';why='every combination, no ON: 2 classes × 2 subjects = 4 rows. Forget the ON in a normal join and you get this by accident'}
   if(t==='self'){cols=['a.name','b.name'];S.forEach(a=>S.forEach(b2=>{if(a[2]===b2[2]&&a[0]<b2[0])rows.push([a[1],b2[1]])}));sql='FROM students a JOIN students b ON a.class_id = b.class_id AND a.id < b.id';why='a table joined to itself with two aliases — pairs in the same class; a.id &lt; b.id stops duplicates and self-pairs'}
   st.innerHTML='';const wrap=el('div','');wrap.style.cssText='display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap';wrap.innerHTML=(['cross','self'].includes(t)?'':venn(t))+'<div>'+term([[sql,'#93c5fd']])+tbl(cols,rows)+'<div style="font-size:.8rem;color:var(--muted)">'+rows.length+' rows</div></div>';st.appendChild(wrap);msg.innerHTML=why}};
+W.proc=(L)=>{const st=$('.stage',L),msg=$('.msg',L);let cls,log;const reset=()=>{cls={1:1,2:1,3:1,4:2,5:2};log=[]};reset();const nm={1:'Aarav',2:'Sita',3:'Kabir',4:'Meera',5:'Rohan'},cn={1:'3A',2:'3B',9:'9'};
+ const draw=(lines,m)=>{const cnt=c=>Object.values(cls).filter(v=>v==c).length;st.innerHTML=term(lines)+tbl(['class','pupils'],[1,2].map(c=>[cn[c],Object.keys(cls).filter(k=>cls[k]==c).map(k=>nm[k]).join(', ')+' <b style="color:'+(cnt(c)>3?'#dc2626':'inherit')+'">('+cnt(c)+')</b>']));msg.innerHTML=m};
+ L.onclick=e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;if(a==='reset'){reset();return draw(['(fresh room)'],'')}
+  const who=+$('.who',L).value,to=+$('.to',L).value,indb=$('.where',L).value==='db';const full=Object.values(cls).filter(v=>v==to).length>=3;
+  const call=indb?'CALL transfer_pupil('+who+', '+to+');':(a==='api'?'POST /pupils/'+who+'/move {"class": '+to+'}':'UPDATE students SET class_id = '+to+' WHERE id = '+who+';   -- quick script');
+  if(to===9)return draw([[call,'#93c5fd'],['ERROR:  insert or update on table "students" violates foreign key constraint','#f87171']],'the foreign key (lesson 02) refuses a class that does not exist — wherever the call comes from');
+  const checked=indb||a==='api';
+  if(checked&&full)return draw([[call,'#93c5fd'],[indb?'ERROR:  class '+cn[to]+' is full (3 pupils)':'422 Unprocessable: class '+cn[to]+' is full','#f87171']],indb?'the procedure checked the rule <b>next to the data</b> — the API and the script both hit it':'the API checked — this time');
+  cls[who]=to;log.push(nm[who]+' → '+cn[to]);const over=Object.values(cls).filter(v=>v==to).length>3;
+  draw([[call,'#93c5fd'],[over?'UPDATE 1   ← nobody checked the rule':'OK · audit_log: '+log[log.length-1],over?'#fde68a':'#86efac']],over?'<b style="color:#dc2626">4 pupils in one class</b> — the rule lived only in the API, and the script went straight to the table. Put the rule in the room (a procedure, a trigger or a CHECK) and every app obeys it':'moved')}};
 document.querySelectorAll('.lab[data-w]').forEach(L=>{const f=W[L.dataset.w];if(f)try{f(L)}catch(e){console.error(e)}});
 })();
 </script>
