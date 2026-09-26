@@ -52,6 +52,44 @@ flowchart LR
   *materialized* view (Postgres) stores the answer and must be refreshed.
 - `HAVING` filters groups after `GROUP BY` (lesson 03), `WHERE` filters rows before.
 
+### 🧑‍🍳 Code that lives in the room — functions and stored procedures
+
+A **view** stores a question. A **function** returns a value you can use inside SQL
+(`SELECT points(grade) …`). A **stored procedure** does a job — several statements, rules
+and writes — and you run it with `CALL`. A **trigger** (lesson 18) runs by itself when a
+row changes.
+
+[db/postgres/procedures.sql](../../db/postgres/procedures.sql) is the real PostgreSQL version
+(checked with PostgreSQL's own parser; run it in any Postgres 11+):
+
+```sql
+CREATE PROCEDURE transfer_pupil(p_student int, p_class int)
+LANGUAGE plpgsql AS $$
+BEGIN
+  IF (SELECT count(*) FROM students WHERE class_id = p_class) >= 3 THEN
+    RAISE EXCEPTION 'class % is full (3 pupils)', p_class;
+  END IF;
+  UPDATE students SET class_id = p_class WHERE id = p_student;
+  INSERT INTO audit_log (what) VALUES ('pupil ' || p_student || ' moved to class ' || p_class);
+END
+$$;
+
+CALL transfer_pupil(4, 1);   -- ERROR:  class 1 is full (3 pupils)
+CALL transfer_pupil(1, 2);   -- CALL  (and one audit_log row)
+GRANT EXECUTE ON PROCEDURE transfer_pupil(int, int) TO school_api;   -- the API may CALL it, not touch the tables
+```
+
+**SQLite has no stored procedures** — it runs inside your app, so the app *is* the
+procedure. `python3 db/demo.py procs` runs the closest SQLite pieces: a Python function
+registered with `conn.create_function("points", …)` and used inside SQL, and a `BEFORE
+UPDATE` trigger with `RAISE(ABORT, 'class is full (3 pupils)')` that refuses Meera's move
+into a full 3A for **any** app.
+
+- ✅ one rule for every app and script, checked next to the data, in one round trip
+- ✅ `GRANT EXECUTE` without granting the tables (lesson 13)
+- ❌ logic hidden from the app's code review, tests and debugger; deploy it with migrations (lesson 08)
+- ❌ vendor-specific (PL/pgSQL, T-SQL, MySQL's dialect) — keep procedures small and few
+
 ## 🤔 Why
 
 Reports, leaderboards, "top 3 per class", month-over-month change — these are one query
@@ -66,7 +104,7 @@ inside a CTE, then ranked per class, filtered against the average, and saved as 
 ## 🧪 Try it
 
 ```bash
-python3 db/demo.py window
+python3 db/demo.py window procs
 python3 - <<'EOF'
 import sqlite3
 c = sqlite3.connect("db/school.db")
@@ -83,7 +121,8 @@ EOF
 `('3A', 'Sita', 20, 1, 20)`, `('3A', 'Aarav', 17, 2, 37)`, `('3A', 'Kabir', 15, 3, 52)`, then
 `3B` starting again at rank 1 with Meera; the average is `16.6` and only Sita, Meera and
 Aarav are above it; the view returns the same totals. In your snippet the first `previous`
-is `None`.
+is `None`. `procs` ranks Sita, Meera, Aarav with `points()`, refuses `Meera → 3A` with
+`class is full (3 pupils)` and moves Aarav to 3B.
 
 ## 🏁 What you just proved
 
@@ -97,6 +136,8 @@ so every app asks it the same way.
 - `RANK` vs `ROW_NUMBER` with ties: RANK gives 1, 1, 3; ROW_NUMBER gives 1, 2, 3
 - a correlated subquery that runs once per row on a big table — check `EXPLAIN`
 - treating a view as a speed-up: a plain view stores the question, not the answer
+- a business rule that lives only in one app while scripts write to the tables directly
+- putting ALL business logic into procedures — hard to test, review and deploy
 
 > 🏭 **Why this matters in production:** analytics pages, rankings and billing reports are
 > written with CTEs and windows; reviewers expect them instead of app-side loops.
