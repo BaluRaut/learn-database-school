@@ -1,8 +1,9 @@
-"""The record room, live — every lesson's queries against a real SQLite database. (Lessons 01–12)
+"""The record room, live — every lesson's queries against a real SQLite database. (Lessons 01–18)
 
 Zero dependencies: Python's built-in sqlite3. Run a section or all of them:
     python3 db/demo.py              # everything, in lesson order
     python3 db/demo.py join         # sections: reads join txn model index locks backup nplus1
+                                    #           inject window wal replica appcode olap   (lessons 13–18)
 """
 import os, sqlite3, sys, time, random, shutil
 
@@ -26,6 +27,7 @@ def connect():
 def show(title, rows):
     print(f"── {title}")
     for r in rows: print("   ", r)
+    if not rows: print("    (no rows)")
     print()
 
 def reads(c):                                             # lesson 03
@@ -63,13 +65,17 @@ def model(c):                                             # lesson 05
     except sqlite3.IntegrityError as e:
         print("   💥 impossible grade refused by CHECK:", e, "\n")
 
-def index(c):                                             # lesson 06
+def attendance(c):
+    """200,000 attendance lines (lesson 06's big register; lesson 18 reports on it)."""
     c.execute("CREATE TABLE IF NOT EXISTS attendance (id INTEGER PRIMARY KEY, student_id INTEGER, day TEXT, present INTEGER)")
     if c.execute("SELECT COUNT(*) FROM attendance").fetchone()[0] == 0:
         random.seed(1)
         c.executemany("INSERT INTO attendance (student_id, day, present) VALUES (?, ?, ?)",
                       [(random.randint(1, 5000), f"2026-{random.randint(1,12):02d}-{random.randint(1,28):02d}", random.randint(0, 1)) for _ in range(200_000)])
         c.commit()
+
+def index(c):                                             # lesson 06
+    attendance(c)
     q = "SELECT COUNT(*) FROM attendance WHERE student_id = 4242"
     def timed():
         t = time.perf_counter(); n = c.execute(q).fetchone()[0]; return n, (time.perf_counter() - t) * 1000
@@ -111,7 +117,119 @@ def nplus1(c):                                            # lesson 12
     fast = (time.perf_counter() - t) * 1000
     print(f"── N+1: {len(out)+1} queries, {slow:.2f} ms · one JOIN: 1 query, {fast:.2f} ms — same answer {one[:2]}…\n")
 
-SECTIONS = dict(reads=reads, join=join, txn=txn, model=model, index=index, locks=locks, backup=backup, nplus1=nplus1)
+def inject(c):                                            # lesson 13
+    typed = "x' OR '1'='1"                                               # what an attacker types as the roll number
+    glued = "SELECT name FROM students WHERE roll_no = '" + typed + "'"   # ❌ gluing input into SQL
+    print("── the glued query the database actually received:\n    " + glued)
+    show("❌ string-glued login — every student leaks", c.execute(glued).fetchall())
+    show("✅ parameterised (?) — the input is only ever a value", c.execute(
+        "SELECT name FROM students WHERE roll_no = ?", (typed,)).fetchall())
+    ro = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)                  # a read-only pass (least privilege)
+    print("── the reporting app's read-only connection reads:", ro.execute("SELECT COUNT(*) FROM students").fetchone()[0], "students")
+    try:
+        ro.execute("DELETE FROM grades")
+    except sqlite3.OperationalError as e:
+        print("   🔒 …and cannot write:", e, "\n")
+    ro.close()
+
+POINTS = "CASE grade WHEN 'A+' THEN 10 WHEN 'A' THEN 9 WHEN 'B+' THEN 8 WHEN 'B' THEN 7 ELSE 6 END"
+
+def window(c):                                            # lesson 14
+    cte = f"WITH points AS (SELECT student_id, SUM({POINTS}) AS pts FROM grades GROUP BY student_id) "
+    show("CTE + window: RANK() and a running total inside each class", c.execute(cte + """
+        SELECT cl.name, s.name, p.pts,
+               RANK() OVER (PARTITION BY cl.name ORDER BY p.pts DESC)            AS rank_in_class,
+               SUM(p.pts) OVER (PARTITION BY cl.name ORDER BY p.pts DESC)        AS running_total
+        FROM points p JOIN students s ON s.id = p.student_id JOIN classes cl ON cl.id = s.class_id
+        ORDER BY cl.name, rank_in_class""").fetchall())
+    show("subquery: above the school average (" + str(c.execute(cte + "SELECT AVG(pts) FROM points").fetchone()[0]) + ")", c.execute(cte + """
+        SELECT s.name, p.pts FROM points p JOIN students s ON s.id = p.student_id
+        WHERE p.pts > (SELECT AVG(pts) FROM points) ORDER BY p.pts DESC""").fetchall())
+    c.execute(f"""CREATE VIEW IF NOT EXISTS report_card AS
+        SELECT s.name, COUNT(*) AS subjects, SUM({POINTS}) AS pts FROM grades g JOIN students s ON s.id = g.student_id GROUP BY s.id""")
+    show("VIEW report_card — a saved question, used like a table", c.execute("SELECT * FROM report_card ORDER BY pts DESC LIMIT 3").fetchall())
+
+def wal(c):                                               # lesson 15
+    print("── journal mode before:", c.execute("PRAGMA journal_mode").fetchone()[0], "→ after:", c.execute("PRAGMA journal_mode=WAL").fetchone()[0])
+    reader = sqlite3.connect(DB, isolation_level=None)
+    reader.execute("BEGIN"); snap = reader.execute("SELECT name FROM students WHERE id = 1").fetchone()[0]
+    c.execute("UPDATE students SET name = 'Aarav S' WHERE id = 1"); c.commit()   # the writer does NOT wait for the reader
+    print(f"   ✍️  writer committed 'Aarav S' while the reader was mid-transaction — no 'database is locked'")
+    print(f"   👀 reader, same transaction, still sees its snapshot: {reader.execute('SELECT name FROM students WHERE id = 1').fetchone()[0]!r} (was {snap!r})")
+    reader.execute("COMMIT")
+    print(f"   👀 reader, new transaction: {reader.execute('SELECT name FROM students WHERE id = 1').fetchone()[0]!r}")
+    reader.close()
+    print(f"   📼 school.db-wal holds the new pages first: {os.path.getsize(DB + '-wal'):,} bytes")
+    c.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    print(f"   🧹 checkpoint copies them into school.db: -wal now {os.path.getsize(DB + '-wal'):,} bytes")
+    c.execute("UPDATE students SET name = 'Aarav' WHERE id = 1"); c.commit()
+    print("── journal mode back to:", c.execute("PRAGMA journal_mode=DELETE").fetchone()[0], "\n")
+
+def replica(c):                                           # lesson 16 — two SQLite rooms stand in for a primary and a replica
+    rep = sqlite3.connect(":memory:"); c.backup(rep)                     # the base copy
+    shipped = []                                                          # the change log on its way to the replica
+    def write(sql, args): c.execute(sql, args); c.commit(); shipped.append((sql, args))
+    def ship():
+        for sql, args in shipped: rep.execute(sql, args)
+        rep.commit(); shipped.clear()
+    count = lambda db: db.execute("SELECT COUNT(*) FROM students").fetchone()[0]
+    print("── (simulated: school.db is the primary, an in-memory copy is the replica, a Python list is the shipped log)")
+    write("INSERT INTO students (name, roll_no, class_id) VALUES (?, ?, ?)", ("Diya", "3B-03", 2))
+    print(f"── primary: {count(c)} students · replica, before the log arrives: {count(rep)} — replication lag")
+    print("   ↳ a parent who just enrolled Diya and reloads from the replica sees NO Diya: read your own writes from the primary")
+    ship(); print(f"── log shipped → replica: {count(rep)} students")
+    write("INSERT INTO students (name, roll_no, class_id) VALUES (?, ?, ?)", ("Ishaan", "3B-04", 2))
+    print("   💥 the primary dies before shipping Ishaan's line → promote the replica (failover)")
+    names = [r[0] for r in rep.execute("SELECT name FROM students ORDER BY id").fetchall()]
+    print(f"── new primary has {len(names)} students: Ishaan {'is there' if 'Ishaan' in names else 'is LOST'} — async replication can lose the last writes (RPO > 0);")
+    print("   synchronous replication waits for the replica's 'got it' before COMMIT returns, so nothing is lost — each commit pays a round trip\n")
+    rep.close()
+    c.execute("DELETE FROM students WHERE roll_no IN ('3B-03', '3B-04')"); c.commit()
+
+def appcode(c):                                           # lesson 17
+    c.execute("CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY, student_id INTEGER, at TEXT)")
+    rows = [(i % 5 + 1, f"2026-09-{i % 28 + 1:02d}") for i in range(2000)]
+    t = time.perf_counter()
+    for r in rows: c.execute("INSERT INTO visits (student_id, at) VALUES (?, ?)", r); c.commit()   # commit per row
+    each = (time.perf_counter() - t) * 1000
+    t = time.perf_counter()
+    with c: c.executemany("INSERT INTO visits (student_id, at) VALUES (?, ?)", rows)            # one transaction
+    batch = (time.perf_counter() - t) * 1000
+    print(f"── 2,000 inserts: commit per row {each:.0f} ms · one transaction {batch:.0f} ms — every COMMIT is a trip to the disk")
+    other = sqlite3.connect(DB, timeout=0); other.execute("BEGIN IMMEDIATE")   # another app holds the write lock
+    busy = sqlite3.connect(DB, timeout=0)
+    for attempt in range(1, 5):
+        try:
+            with busy: busy.execute("UPDATE students SET name = name WHERE id = 1")
+            print(f"   ✅ attempt {attempt}: done"); break
+        except sqlite3.OperationalError as e:
+            wait = 0.05 * 2 ** (attempt - 1)
+            print(f"   ⏳ attempt {attempt}: {e} → retry in {wait*1000:.0f} ms (backoff)")
+            if attempt == 2: other.rollback()                           # the other app finishes its work
+            time.sleep(wait)
+    other.close(); busy.close()
+    c.execute("DROP TABLE visits"); c.commit(); print()
+
+def olap(c):                                              # lesson 18
+    attendance(c)
+    report = "SELECT substr(day, 1, 7) AS month, ROUND(AVG(present) * 100, 1) FROM attendance GROUP BY month ORDER BY month LIMIT 3"
+    t = time.perf_counter(); live = c.execute(report).fetchall(); ms_live = (time.perf_counter() - t) * 1000
+    c.execute("DROP TABLE IF EXISTS attendance_by_month")
+    c.execute("""CREATE TABLE attendance_by_month AS                          -- the nightly ETL job
+                 SELECT substr(day, 1, 7) AS month, COUNT(*) AS lines, AVG(present) AS rate FROM attendance GROUP BY month""")
+    t = time.perf_counter()
+    warm = c.execute("SELECT month, ROUND(rate * 100, 1) FROM attendance_by_month ORDER BY month LIMIT 3").fetchall()
+    ms_warm = (time.perf_counter() - t) * 1000
+    print(f"── report on the live 200,000-line table: {ms_live:.1f} ms · on the nightly summary (12 rows): {ms_warm:.2f} ms")
+    print(f"   same answer: {live == warm} → {warm}")
+    c.execute("CREATE TABLE IF NOT EXISTS grade_changes (id INTEGER PRIMARY KEY, grade_id INTEGER, old TEXT, new TEXT, at TEXT DEFAULT CURRENT_TIMESTAMP)")
+    c.execute("""CREATE TRIGGER IF NOT EXISTS cdc_grades AFTER UPDATE OF grade ON grades
+                 BEGIN INSERT INTO grade_changes (grade_id, old, new) VALUES (OLD.id, OLD.grade, NEW.grade); END""")
+    c.execute("UPDATE grades SET grade = 'A' WHERE student_id = 5 AND subject = 'maths'"); c.commit()
+    show("CDC: a trigger records every grade change for the warehouse to pick up", c.execute("SELECT grade_id, old, new FROM grade_changes").fetchall())
+
+SECTIONS = dict(reads=reads, join=join, txn=txn, model=model, index=index, locks=locks, backup=backup, nplus1=nplus1,
+                inject=inject, window=window, wal=wal, replica=replica, appcode=appcode, olap=olap)
 
 if __name__ == "__main__":
     fresh()

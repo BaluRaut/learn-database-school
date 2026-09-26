@@ -38,7 +38,7 @@
    💥 impossible grade refused by CHECK: CHECK constraint failed: grade IN ('A+','A','B+','B','C') 
 
 ═══ index ═══
-── without an index: SCAN attendance → 48 rows in 2.4 ms
+── without an index: SCAN attendance → 48 rows in 2.6 ms
 ── with the card catalogue: SEARCH attendance USING COVERING INDEX idx_attendance_student (student_id=?) → 48 rows in 0.0 ms
 
 ═══ locks ═══
@@ -63,5 +63,69 @@
 
 ═══ nplus1 ═══
 ── N+1: 6 queries, 0.10 ms · one JOIN: 1 query, 0.04 ms — same answer [('Aarav', 2), ('Sita', 2)]…
+
+═══ inject ═══
+── the glued query the database actually received:
+    SELECT name FROM students WHERE roll_no = 'x' OR '1'='1'
+── ❌ string-glued login — every student leaks
+    ('Aarav',)
+    ('Sita',)
+    ('Kabir',)
+    ('Meera',)
+    ('Rohan',)
+
+── ✅ parameterised (?) — the input is only ever a value
+    (no rows)
+
+── the reporting app's read-only connection reads: 5 students
+   🔒 …and cannot write: attempt to write a readonly database 
+
+═══ window ═══
+── CTE + window: RANK() and a running total inside each class
+    ('3A', 'Sita', 20, 1, 20)
+    ('3A', 'Aarav', 17, 2, 37)
+    ('3A', 'Kabir', 15, 3, 52)
+    ('3B', 'Meera', 18, 1, 18)
+    ('3B', 'Rohan', 13, 2, 31)
+
+── subquery: above the school average (16.6)
+    ('Sita', 20)
+    ('Meera', 18)
+    ('Aarav', 17)
+
+── VIEW report_card — a saved question, used like a table
+    ('Sita', 2, 20)
+    ('Meera', 2, 18)
+    ('Aarav', 2, 17)
+
+═══ wal ═══
+── journal mode before: delete → after: wal
+   ✍️  writer committed 'Aarav S' while the reader was mid-transaction — no 'database is locked'
+   👀 reader, same transaction, still sees its snapshot: 'Aarav' (was 'Aarav')
+   👀 reader, new transaction: 'Aarav S'
+   📼 school.db-wal holds the new pages first: 4,152 bytes
+   🧹 checkpoint copies them into school.db: -wal now 0 bytes
+── journal mode back to: delete 
+
+═══ replica ═══
+── (simulated: school.db is the primary, an in-memory copy is the replica, a Python list is the shipped log)
+── primary: 6 students · replica, before the log arrives: 5 — replication lag
+   ↳ a parent who just enrolled Diya and reloads from the replica sees NO Diya: read your own writes from the primary
+── log shipped → replica: 6 students
+   💥 the primary dies before shipping Ishaan's line → promote the replica (failover)
+── new primary has 6 students: Ishaan is LOST — async replication can lose the last writes (RPO > 0);
+   synchronous replication waits for the replica's 'got it' before COMMIT returns, so nothing is lost — each commit pays a round trip
+
+═══ appcode ═══
+── 2,000 inserts: commit per row 470 ms · one transaction 2 ms — every COMMIT is a trip to the disk
+   ⏳ attempt 1: database is locked → retry in 50 ms (backoff)
+   ⏳ attempt 2: database is locked → retry in 100 ms (backoff)
+   ✅ attempt 3: done
+
+═══ olap ═══
+── report on the live 200,000-line table: 45.1 ms · on the nightly summary (12 rows): 0.04 ms
+   same answer: True → [('2026-01', 49.7), ('2026-02', 50.0), ('2026-03', 50.5)]
+── CDC: a trigger records every grade change for the warehouse to pick up
+    (9, 'B', 'A')
 
 ✅ done — the record room survived every lesson

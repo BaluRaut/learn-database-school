@@ -25,15 +25,16 @@ study plan and the before-and-trade-offs page.
 
 ```bash
 python3 db/demo.py        # builds school.db, then: reads, a JOIN, a rollback, a constraint refusal,
-                          # an index race on 200,000 rows, a lock between two clerks, a restore, an N+1
+                          # an index race on 200,000 rows, a lock between two clerks, a restore, an N+1,
+                          # an injection and its fix, window functions, WAL + MVCC, a failover, batching, OLAP
 python3 db/migrate.py     # renovates the room: three migrations, applied once each, logged
 ```
 
 ## 🗺️ The big picture
 
-![The big picture: the record room (tables, keys, SQL, transactions, modelling, indexes) and running it (concurrency, migrations, backups, scaling, NoSQL, operations)](docs/images/big-picture-4k.png)
+![The big picture: the record room (tables, keys, SQL, transactions, modelling, indexes), running it (concurrency, migrations, backups, scaling, NoSQL, operations) and going deeper (security, advanced SQL, WAL and MVCC, replication, app code, OLTP vs OLAP)](docs/images/big-picture-4k.png)
 
-## 🎓 The 12 lessons
+## 🎓 The 18 lessons
 
 Each numbered branch adds ONE lesson folder (`lessons/NN-topic/README.md`) with an
 explain-like-I'm-5 story, a school analogy, a diagram, **What / Why / How**, a
@@ -67,6 +68,17 @@ git checkout lesson-02-tables-rows-keys  # ...keep going, one branch at a time
 | 11 | `lesson-11-nosql-other-rooms` | Document, key-value, columnar, graph, vector | Choosing the room for the question 🏘️ |
 | 12 | `lesson-12-performance-ops` | N+1, slow-query log, the on-call checklist | The record room on call 🩺 |
 
+### Part 3 — going deeper 🔬
+
+| # | Branch | You learn | Analogy |
+|---|---|---|---|
+| 13 | `lesson-13-security` | SQL injection, parameters, least privilege, encryption | The locked register 🛡️ |
+| 14 | `lesson-14-advanced-sql` | Subqueries, CTEs, window functions, views | Rankings without losing a row 🏆 |
+| 15 | `lesson-15-inside-the-engine` | Write-ahead log, crash recovery, MVCC, vacuum | The archivist's diary 📼 |
+| 16 | `lesson-16-replication-failover` | Streaming replication, lag, sync vs async, failover, CAP | Copies of the room 📡 |
+| 17 | `lesson-17-app-code` | Pools, transactions, batching, retries with backoff, ORMs | The helper with a box 🧑‍💻 |
+| 18 | `lesson-18-oltp-olap` | OLTP vs OLAP, ETL, columnar, CDC with a trigger | The office and the archive 🏛️ |
+
 ## 📦 What's in this repo (main branch)
 
 ```
@@ -74,7 +86,8 @@ learn-database-school/
 ├── db/
 │   ├── schema.sql            # the registers: classes, students, grades, homework — with keys and constraints
 │   ├── seed.sql              # five students, ten grades
-│   ├── demo.py               # every lesson's queries, live (sections: reads join txn model index locks backup nplus1)
+│   ├── demo.py               # every lesson's queries, live (sections: reads join txn model index locks backup nplus1
+│   │                         #   inject window wal replica appcode olap)
 │   ├── migrate.py            # applies db/migrations/*.sql once each, logged in schema_migrations
 │   └── migrations/           # 001_init · 002_add_house · 003_index_grades_subject
 └── docs/                     # the GitHub Pages site
