@@ -46,15 +46,36 @@ flowchart LR
   `SELECT *` is for exploring, not for programs (columns change).
 - `WHERE` filters rows: `=`, `<`, `IN (…)`, `LIKE 'Si%'`, `IS NULL`,
   `AND`/`OR`. `NULL` is "unknown": `= NULL` is never true — use `IS NULL`.
-- `JOIN … ON` combines registers by key. `INNER JOIN` keeps matches
-  only; `LEFT JOIN` keeps every left row even with no match (lesson 12's
-  N+1 fix uses it).
+- `JOIN … ON` combines registers by key — see **the JOIN family** below.
 - `GROUP BY` collapses rows into groups; `COUNT`, `SUM`, `AVG`, `MAX`
   summarise them; `HAVING` filters groups.
 - `ORDER BY … LIMIT n OFFSET m` — pages. Cursor pagination
   (API school L08) is `WHERE id > :last ORDER BY id LIMIT n`.
 - SQL is **declarative**: you say *what*; the planner picks *how*
   (lesson 06 shows you its route with `EXPLAIN QUERY PLAN`).
+
+### 🔗 The JOIN family — which rows survive when a partner is missing?
+
+`python3 db/demo.py joins` builds a tiny `library_cards` table: Aarav, Sita and Meera have
+cards, **Kabir and Rohan have none**, and card **104 belongs to a visitor** (student 9, not
+a pupil). Then it runs every kind of join on `students s … library_cards l ON l.student_id = s.id`:
+
+| JOIN | keeps | rows | real result |
+|---|---|---|---|
+| `INNER JOIN` | only pairs that match on both sides | 3 | Aarav 101 · Sita 102 · Meera 103 |
+| `LEFT JOIN` | every **left** row (pupils); no partner → `NULL` | 5 | … + Kabir `NULL` · Rohan `NULL` |
+| `RIGHT JOIN` | every **right** row (cards); no partner → `NULL` | 4 | … + `NULL` 104 |
+| `FULL OUTER JOIN` | everything from both sides | 6 | Kabir `NULL` · Rohan `NULL` · `NULL` 104 + the 3 pairs |
+| anti-join: `LEFT JOIN … WHERE l.card IS NULL` | left rows with **no** partner | 2 | Kabir · Rohan |
+| `CROSS JOIN` (no `ON`) | every combination | 2 × 2 = 4 | 3A maths · 3A science · 3B maths · 3B science |
+| self join: `students a JOIN students b ON a.class_id = b.class_id AND a.id < b.id` | a table against itself | 4 | Aarav–Sita · Aarav–Kabir · Sita–Kabir · Meera–Rohan |
+
+- `JOIN` alone means `INNER JOIN`; `LEFT JOIN` = `LEFT OUTER JOIN`.
+- `RIGHT JOIN` is a `LEFT JOIN` with the tables swapped — most teams just write LEFT.
+- `FULL OUTER JOIN` needs SQLite 3.39+; MySQL has none (write `LEFT … UNION … RIGHT`).
+- The anti-join is also written `WHERE NOT EXISTS (SELECT 1 FROM library_cards l WHERE l.student_id = s.id)`.
+- A condition on the right table belongs in `ON`, not `WHERE`, if you want to keep the
+  unmatched left rows — `WHERE l.card > 101` quietly turns a LEFT JOIN back into an INNER one.
 
 ## 🤔 Why
 
@@ -65,13 +86,13 @@ same order, are behind all of them.
 
 ## 🔧 How (in this repo)
 
-`reads()` and `join()` in [db/demo.py](../../db/demo.py) are this lesson;
+`reads()`, `join()` and `joins()` in [db/demo.py](../../db/demo.py) are this lesson;
 read the SQL strings aloud in school words before you run them.
 
 ## 🧪 Try it
 
 ```bash
-python3 db/demo.py reads join
+python3 db/demo.py reads join joins
 python3 - <<'EOF'
 import sqlite3; c = sqlite3.connect("db/school.db")
 print(c.execute("SELECT name FROM students WHERE name LIKE 'S%' OR roll_no IN ('3B-01')").fetchall())
@@ -82,7 +103,7 @@ EOF
 
 ## ✅ Verify — what you should see
 
-`reads` prints two 3A students in alphabetical order; `join` prints five maths grades sorted by grade then name, and a `GROUP BY` with `('3A', 3)` and `('3B', 2)`. Your three queries print `Sita` and `Meera`, an average per class, and every student with two or more grades.
+`reads` prints two 3A students in alphabetical order; `join` prints five maths grades sorted by grade then name, and a `GROUP BY` with `('3A', 3)` and `('3B', 2)`. `joins` prints 3 rows for INNER, 5 for LEFT (Kabir and Rohan with `None`), 4 for RIGHT (`(None, 104)`), 6 for FULL OUTER, Kabir and Rohan for the anti-join, 4 timetable pairs and 4 study-buddy pairs. Your three queries print `Sita` and `Meera`, an average per class, and every student with two or more grades.
 
 ## 🏁 What you just proved
 
@@ -93,6 +114,8 @@ You can ask the archivist filtered, joined, grouped and paged questions — and 
 - `SELECT *` in application code — a new column silently changes your program's input
 - `WHERE grade = NULL` — always false; use `IS NULL`
 - forgetting the `ON` condition — a cross join multiplies every row by every row
+- a `WHERE` on the right table after a `LEFT JOIN` — it throws away the `NULL` rows you joined to keep
+- `INNER JOIN` when the report must list everyone — pupils without a match silently vanish
 - `ORDER BY` without `LIMIT` on a huge table (or `LIMIT` without `ORDER BY` — "first 10 of what?")
 
 > 🏭 **Why this matters in production:** slow pages are almost always one query with a missing `WHERE`, a `JOIN` without a key, or an `ORDER BY` on an unindexed column — all readable in the SQL once you know the four clauses.
