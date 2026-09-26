@@ -2,8 +2,8 @@
 
 Zero dependencies: Python's built-in sqlite3. Run a section or all of them:
     python3 db/demo.py              # everything, in lesson order
-    python3 db/demo.py join         # sections: reads join txn model index locks backup nplus1
-                                    #           inject window wal replica appcode olap   (lessons 13–18)
+    python3 db/demo.py join         # sections: reads join joins txn model index locks backup nplus1
+                                    #           inject window procs wal replica appcode olap   (lessons 13–18)
 """
 import os, sqlite3, sys, time, random, shutil
 
@@ -41,6 +41,27 @@ def join(c):                                              # lesson 03
         WHERE g.subject = 'maths' ORDER BY g.grade, s.name""").fetchall())
     show("GROUP BY — one row per class", c.execute("""
         SELECT c.name, COUNT(*) AS students FROM students s JOIN classes c ON c.id = s.class_id GROUP BY c.name""").fetchall())
+
+def joins(c):                                             # lesson 03 — the JOIN family
+    c.execute("DROP TABLE IF EXISTS library_cards")
+    c.execute("CREATE TABLE library_cards (card INTEGER PRIMARY KEY, student_id INTEGER)")   # no FK: a visitor has a card too
+    c.executemany("INSERT INTO library_cards VALUES (?, ?)", [(101, 1), (102, 2), (103, 4), (104, 9)])   # Aarav, Sita, Meera, a visitor
+    on = "FROM students s {} library_cards l ON l.student_id = s.id"
+    show("INNER JOIN — only pupils WITH a card (matches on both sides)", c.execute(
+        "SELECT s.name, l.card " + on.format("INNER JOIN") + " ORDER BY l.card").fetchall())
+    show("LEFT JOIN — every pupil; no card → NULL", c.execute(
+        "SELECT s.name, l.card " + on.format("LEFT JOIN") + " ORDER BY s.id").fetchall())
+    show("RIGHT JOIN — every card; a card with no pupil → NULL name", c.execute(
+        "SELECT s.name, l.card " + on.format("RIGHT JOIN") + " ORDER BY l.card").fetchall())
+    show("FULL OUTER JOIN — everyone from both sides", c.execute(
+        "SELECT s.name, l.card " + on.format("FULL OUTER JOIN") + " ORDER BY s.id IS NULL, s.id").fetchall())
+    show("anti-join (LEFT JOIN … WHERE card IS NULL) — pupils with NO card", c.execute(
+        "SELECT s.name " + on.format("LEFT JOIN") + " WHERE l.card IS NULL ORDER BY s.id").fetchall())
+    show("CROSS JOIN — every class × every subject (the timetable grid)", c.execute(
+        "SELECT c.name, sub.subject FROM classes c CROSS JOIN (SELECT DISTINCT subject FROM grades) sub ORDER BY c.name, sub.subject").fetchall())
+    show("self join — two pupils in the same class (study buddies)", c.execute("""
+        SELECT a.name, b.name FROM students a JOIN students b ON a.class_id = b.class_id AND a.id < b.id ORDER BY a.id, b.id""").fetchall())
+    c.execute("DROP TABLE library_cards"); c.commit()
 
 def txn(c):                                               # lesson 04
     before = c.execute("SELECT name, class_id FROM students WHERE id IN (1, 4) ORDER BY id").fetchall()
@@ -149,6 +170,23 @@ def window(c):                                            # lesson 14
         SELECT s.name, COUNT(*) AS subjects, SUM({POINTS}) AS pts FROM grades g JOIN students s ON s.id = g.student_id GROUP BY s.id""")
     show("VIEW report_card — a saved question, used like a table", c.execute("SELECT * FROM report_card ORDER BY pts DESC LIMIT 3").fetchall())
 
+def procs(c):                                             # lesson 14 — code that lives in the room
+    print("── SQLite has no stored procedures (it runs inside your app); db/postgres/procedures.sql is the Postgres version.")
+    print("   The closest SQLite pieces: a function the SQL can call, and a rule the room enforces for every app.\n")
+    c.create_function("points", 1, lambda g: {"A+": 10, "A": 9, "B+": 8, "B": 7}.get(g, 6), deterministic=True)
+    show("points(grade) — a function used inside SQL (Postgres: CREATE FUNCTION points)", c.execute(
+        "SELECT s.name, SUM(points(g.grade)) AS pts FROM grades g JOIN students s ON s.id = g.student_id GROUP BY s.id ORDER BY pts DESC LIMIT 3").fetchall())
+    c.execute("""CREATE TRIGGER IF NOT EXISTS class_limit BEFORE UPDATE OF class_id ON students
+                 WHEN (SELECT COUNT(*) FROM students WHERE class_id = NEW.class_id) >= 3
+                 BEGIN SELECT RAISE(ABORT, 'class is full (3 pupils)'); END""")
+    for sid, cls, who in ((4, 1, "Meera → 3A"), (1, 2, "Aarav → 3B")):
+        try:
+            with c: c.execute("UPDATE students SET class_id = ? WHERE id = ?", (cls, sid))
+            print(f"   ✅ {who}: moved")
+        except sqlite3.IntegrityError as e:
+            print(f"   ⛔ {who}: {e} — refused by the room itself, whichever app asked")
+    c.execute("UPDATE students SET class_id = 1 WHERE id = 1"); c.execute("DROP TRIGGER class_limit"); c.commit(); print()
+
 def wal(c):                                               # lesson 15
     print("── journal mode before:", c.execute("PRAGMA journal_mode").fetchone()[0], "→ after:", c.execute("PRAGMA journal_mode=WAL").fetchone()[0])
     reader = sqlite3.connect(DB, isolation_level=None)
@@ -228,8 +266,8 @@ def olap(c):                                              # lesson 18
     c.execute("UPDATE grades SET grade = 'A' WHERE student_id = 5 AND subject = 'maths'"); c.commit()
     show("CDC: a trigger records every grade change for the warehouse to pick up", c.execute("SELECT grade_id, old, new FROM grade_changes").fetchall())
 
-SECTIONS = dict(reads=reads, join=join, txn=txn, model=model, index=index, locks=locks, backup=backup, nplus1=nplus1,
-                inject=inject, window=window, wal=wal, replica=replica, appcode=appcode, olap=olap)
+SECTIONS = dict(reads=reads, join=join, joins=joins, txn=txn, model=model, index=index, locks=locks, backup=backup, nplus1=nplus1,
+                inject=inject, window=window, procs=procs, wal=wal, replica=replica, appcode=appcode, olap=olap)
 
 if __name__ == "__main__":
     fresh()
